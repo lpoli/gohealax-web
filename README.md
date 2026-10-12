@@ -5,14 +5,14 @@ through GitHub Pages. Plain HTML, CSS and JavaScript; no framework, package mana
 Decision: [ADR-0008](../docs/decisions/0008-static-informational-website.md).
 
 Start with [Web instructions](AGENTS.md), [roadmap](docs/roadmap.md) and [handoff](docs/handoff.md).
-The roadmap owns the seven approval gates. The first session implements WEB-01 only; existing
-public pages stay unchanged until subsequent approved milestones.
+The roadmap owns the seven approval gates. WEB-02 replaces the homepage redirect with a responsive landing page; owner layout approval is
+pending. Later increments follow the roadmap gates.
 
 ## Source and documentation
 
 | Location | Purpose |
 |---|---|
-| `site/` | Complete deployable source; currently index redirect, About, Privacy and shared CSS |
+| `site/` | Complete deployable source; landing, About, Privacy, local hero assets and shared CSS |
 | [Design](docs/design.md) | Routes, composition, styling and progressive navigation |
 | [Content](docs/content.md) | Product truth, availability, contributor/contact editing and legal text |
 | [Media](docs/media.md) | Optional accessible player configuration (WEB-04) |

@@ -27,8 +27,9 @@ checker catches broken links, fragments, duplicates, invalid routes and metadata
 `audit.py` reports target-quality gaps with exit 1. These are findings to fix, not expected failures
 to preserve. Never assert a defect must exist and never make it disappear by blanket skipping a page.
 
-Promote resolved audit rules into mandatory tests in the milestone that fixes them. WEB-02 adds
-landing sections and no redirect; WEB-03 content/availability/screenshot review; WEB-04 disclaimer and
+Promote resolved audit rules into mandatory tests in the milestone that fixes them. WEB-02 enforces
+landing section order, no redirect, visible HTML links, honest availability and local responsive hero
+assets; WEB-03 content/availability/screenshot review; WEB-04 disclaimer and
 interaction cases; WEB-05 metadata, image dimensions, sitemap and complete route coverage. By WEB-05
 the audit must pass. WEB-06 adds exporter tests (including symlinks, reproducibility and stale files).
 
@@ -40,9 +41,10 @@ whether the run is a baseline with deferred coverage; a skipped interaction test
 pass. Failed requests/imports, thrown assertions and timed-out loads must remain failures. The runner
 has a visible static loading message and a watchdog for bootstrap failure.
 
-WEB-01 real-page checks cover navigation/contact, rendered width, stylesheet application and HTTP
-loading. The homepage is parsed without executing its old redirect; it is separately listed in the
-audit. WEB-04 must import the production `site.js`/`media.js` functions into fixtures, with controlled
+WEB-02 real-page checks include landing/About/Privacy navigation/contact, rendered width at
+320, 375, 768, 1024 and 1440px, stylesheet application and HTTP loading, with scripts disabled.
+The homepage redirect is now forbidden in both the offline gate and browser runner. WEB-04 must
+import the production `site.js`/`media.js` functions into fixtures, with controlled
 player adapters. Cover menu state, Escape/focus, link activation, duplicate initialization, resize,
 invalid/disabled/media activation and playback failures. Add modules and their tests together; do
 not create a test-only imitation of the production controller. The baseline runner self-check is

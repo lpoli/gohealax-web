@@ -2,7 +2,7 @@ import { assert, fetchPage, runCase, Skip, withFrame } from './runner.js';
 
 const cases = [];
 const test = (name, action) => cases.push({ name, action });
-const contentRoutes = ['About.html', 'privacy-policy.html'];
+const contentRoutes = ['index.html', 'About.html', 'privacy-policy.html'];
 
 test('Runner distinguishes assertions, skips and timeouts (infrastructure only)', async () => {
   const pass = await runCase('success', () => {});
@@ -20,7 +20,7 @@ test('Isolated fixture loads and is disposed (infrastructure only)', async signa
   assert(!document.querySelector('#fixtures iframe'), 'fixture leaked');
 });
 
-test('Existing homepage is retrievable and its HTML link target resolves', async signal => {
+test('Landing homepage is retrievable and its HTML link target resolves', async signal => {
   const doc = await fetchPage('../site/index.html', signal);
   assert(doc.title.trim(), 'missing title');
   const links = [...doc.querySelectorAll('body a[href]')];
@@ -29,12 +29,14 @@ test('Existing homepage is retrievable and its HTML link target resolves', async
     const target = new URL(link.getAttribute('href'), new URL('../site/index.html', location.href));
     if (target.origin === location.origin) await fetchPage(target, signal);
   }
-  // Do not require the existing redirect: WEB-02 replaces it, and audit.py reports it today.
+  assert(!doc.querySelector('meta[http-equiv="refresh"]'), 'homepage redirects');
+  assert(['home', 'benefits', 'demo', 'mission', 'features', 'download', 'team', 'contact']
+    .every(id => doc.getElementById(id)), 'landing section missing');
 });
 
 test('About and Privacy navigation destinations agree', async signal => {
   const routes = [];
-  for (const route of contentRoutes) {
+  for (const route of ['About.html', 'privacy-policy.html']) {
     const doc = await fetchPage(`../site/${route}`, signal);
     routes.push([...doc.querySelectorAll('nav a[href]')].map(a => a.getAttribute('href')).sort());
   }
@@ -61,7 +63,7 @@ for (const route of contentRoutes) {
     }
   });
 
-  for (const width of [320, 768, 1440]) {
+  for (const width of [320, 375, 768, 1024, 1440]) {
     test(`${route}: stylesheet and rendered width at ${width}px, scripts disabled`, async signal => {
       const path = `../site/${route}`;
       await fetchPage(path, signal); // An HTTP error page must not pass the frame load check.
@@ -71,7 +73,7 @@ for (const route of contentRoutes) {
           'stylesheet did not load');
         assert(win.getComputedStyle(doc.body).marginTop === '0px', 'site CSS not applied');
         assert(doc.documentElement.scrollWidth <= win.innerWidth + 1,
-          `horizontal overflow: ${doc.documentElement.scrollWidth} > ${win.innerWidth}`);
+          `horizontal overflow: ${doc.documentElement.scrollWidth} > ${win.innerWidth}; ${[...doc.body.querySelectorAll("*")].filter(n => n.getBoundingClientRect().right > win.innerWidth + 1).slice(0, 8).map(n => n.tagName + "." + n.className + ":" + Math.round(n.getBoundingClientRect().width)).join(", ")}`);
         assert([...doc.querySelectorAll('nav a')].every(a => a.getClientRects().length > 0),
           'HTML navigation is hidden without JavaScript');
       });
@@ -85,7 +87,7 @@ for (const deferred of [
   'Production media disabled, invalid and activated states',
   'Production playback error and timeout fallbacks with controlled adapters',
 ]) {
-  test(deferred, () => { throw new Skip('WEB-04: production modules not implemented in WEB-01'); });
+  test(deferred, () => { throw new Skip('WEB-04: production modules not implemented until WEB-04'); });
 }
 
 const results = [];
@@ -105,10 +107,10 @@ const status = counts.FAIL || counts.TIMEOUT ? 'FAIL' : counts.SKIP ? 'BASELINE_
 window.browserReport = {
   status, counts, results, userAgent: navigator.userAgent, url: location.href,
   timestamp: new Date().toISOString(),
-  scope: 'WEB-01 baseline; scripts disabled in real-page frames; manual and WEB-04 checks deferred',
+  scope: 'WEB-02 layout; scripts disabled in real-page frames; manual and WEB-04 checks deferred',
 };
 document.getElementById('report').textContent = JSON.stringify(window.browserReport, null, 2);
 document.getElementById('summary').textContent = `${status}: ${counts.PASS} pass, ${counts.FAIL} fail, ` +
-  `${counts.TIMEOUT} timeout, ${counts.SKIP} skipped. This is foundation evidence, not release approval.`;
+  `${counts.TIMEOUT} timeout, ${counts.SKIP} skipped. This is layout evidence, not release approval.`;
 document.documentElement.dataset.testStatus = status;
 clearTimeout(window.runnerWatchdog);
