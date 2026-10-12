@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GoHealaX — Web browser baseline</title>
+  <style>
+    body { margin: 2rem auto; padding: 0 1rem; max-width: 72rem; font: 1rem/1.5 system-ui, sans-serif; }
+    li { padding: .35rem; overflow-wrap: anywhere; }
+    [data-status="FAIL"], [data-status="TIMEOUT"] { color: #9b1727; }
+    [data-status="PASS"] { color: #145a38; }
+    #fixtures { overflow: auto; border: 1px solid #777; }
+    iframe { display: block; height: 480px; border: 0; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Web browser baseline</h1>
+    <p>This development-only runner checks existing pages and its isolated fixture infrastructure.
+      WEB-04 navigation and media behavior is deferred, explicitly skipped below. A baseline pass
+      does not certify the finished website. Reload to run again.</p>
+    <p><a href="../site/">Open the current site</a></p>
+    <noscript>JavaScript is disabled. These browser tests have not run.</noscript>
+    <p id="summary" role="status">Loading tests… If this remains visible, the runner did not start.</p>
+    <ol id="results"></ol>
+    <div id="fixtures" aria-label="Current test fixture"></div>
+    <h2>Evidence (copy this report)</h2>
+    <pre id="report">Not run.</pre>
+  </main>
+  <script>
+    // Independent bootstrap watchdog also catches failure to load the ES module.
+    window.runnerWatchdog = setTimeout(() => {
+      if (!window.browserReport) {
+        document.getElementById('summary').textContent = 'TIMEOUT: runner did not finish within 60 seconds.';
+        document.documentElement.dataset.testStatus = 'TIMEOUT';
+      }
+    }, 60000);
+  </script>
+  <script type="module" src="browser.js"></script>
+</body>
+</html>
