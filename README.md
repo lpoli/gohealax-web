@@ -33,10 +33,14 @@ From the repository root:
 python3 -m unittest discover -s web/tests -p 'test_*.py'
 python3 web/tests/audit.py
 python3 scripts/check-doc-links.py
-python3 -m http.server 8000 --bind 127.0.0.1 --directory web
+python3 web/tools/preview.py
 ```
 
-Open `http://127.0.0.1:8000/site/` and `http://127.0.0.1:8000/tests/browser.html`.
+Open `http://127.0.0.1:8765/site/` and `http://127.0.0.1:8765/tests/browser.html`.
+The preview disables caching. For a phone on the same Wi-Fi, run
+`python3 web/tools/preview.py --lan` and open `http://<computer-Wi-Fi-IP>:8765/` on the phone;
+LAN mode serves only website files. Details and the required Guest/sandbox policy are in
+[testing](docs/testing.md#reliable-local-preview-and-phone-inspection).
 The audit reports target-quality gaps independently of the current regression gate; exit 1 is an
 unresolved finding, not a passing release. See the handoff for actual evidence.
 

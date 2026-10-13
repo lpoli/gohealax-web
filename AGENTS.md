@@ -13,6 +13,12 @@ Follow the repository bootstrap and [README](README.md). Before changes, read th
   rights before publication. Do not modify or stage owner reference files incidentally.
 - Run the offline suite and documentation link checker. Browser evidence is separate; record browser,
   version, environment and result, distinguishing agent-run from user-run checks and unrun checks.
+- Owner browser-isolation rule (2026-10-13): every automated/headless Chrome launch uses
+  `--guest` plus a freshly created `--user-data-dir` under `web/.artifacts/`. Never use the owner's
+  normal profile, reuse an earlier automation profile, or attach to an existing personal browser.
+  Keep Chromium's sandbox enabled: never use `--no-sandbox`, `--disable-setuid-sandbox` or equivalent
+  bypasses. Respect the tool execution sandbox too; any needed escalation must obtain explicit tool
+  approval and explain its scope. Guest/profile isolation does not replace process sandboxing.
 - Keep temporary files, browser profiles, reports and export output inside this working directory.
   `web/.artifacts/` and `web/.release/` are ignored. This task-specific rule takes precedence over
   the repository's general advice to put build output elsewhere. Avoid native builds for Web-only work.

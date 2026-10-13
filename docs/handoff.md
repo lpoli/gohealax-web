@@ -363,3 +363,32 @@ Implementation and approval documentation remain uncommitted.
 
 Approval-update validation: `python3 scripts/check-doc-links.py` and `git diff --check` passed.
 Website/test implementation is unchanged in this approval update; browser/native tests were not rerun.
+
+## Preview follow-up and browser isolation requirement
+
+Owner report/request, 2026-10-13: the HTTP preview has an incorrect view while directly opening
+`index.html` in Chrome/Firefox renders properly; future headless Chrome must always use a Guest
+profile and respect sandboxing; provide a mobile inspection method.
+
+Added `web/tools/preview.py`: source directory is independent of the working directory, responses
+are uncached and conditional validators are ignored. Default loopback preview uses port 8765 and
+preserves `/site/` and `/tests/` URLs. Explicit `--lan` mode serves only deployable website files at
+`/` for a real phone on the same Wi-Fi. Phone steps and desktop responsive-mode instructions are in
+[testing](testing.md#reliable-local-preview-and-phone-inspection). No LAN server was started by the
+agent. The owner must run it for phone inspection.
+
+Recorded the owner's Guest requirement in `web/AGENTS.md` and the testing guide: future automated
+Chrome uses `--guest`, a unique fresh repository-local profile per launch, and Chromium's sandbox
+stays enabled. Previous runs used separate automation profiles, not the owner's normal profile;
+some reused those separate profiles and lacked Guest mode. Historical commands remain evidence,
+not approved future launch templates. No browser was launched during this follow-up.
+
+The reported HTTP rendering difference is unresolved pending the precise command/URL and testing
+with the new uncached preview. The cache/path explanation is a hypothesis, not verified owner-host
+state. This tooling follow-up does not change the approved website source or start WEB-05.
+
+Agent-run validation: 35 offline tests PASS, including actual handler response bytes/headers and
+current CSS MIME type with conditional requests, plus LAN-root exclusion of docs/tests/traversal.
+Tests use in-memory HTTP connections without opening sockets. `python3 web/tools/preview.py --help`,
+documentation links and `git diff --check` PASS. Live server/browser/phone rendering has not been
+verified in this update. Changes are uncommitted; WEB-04 commit is `8f1b3be`.

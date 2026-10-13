@@ -87,3 +87,76 @@ freshness, current HTML, original relative asset resolution and missing-page fai
 After changing the runner itself, hard-refresh `/tests/browser.html` once (Ctrl+Shift+R on Linux
 Chrome) to load the updated test modules. Current automated coverage is 42 cases; user rerun evidence
 is separate from the agent's result in the handoff.
+
+## Reliable local preview and phone inspection
+
+Run from the repository root:
+
+```sh
+python3 web/tools/preview.py
+```
+
+Open `http://127.0.0.1:8765/site/`; automated tests are at
+`http://127.0.0.1:8765/tests/browser.html`. The source directory is resolved from the script rather
+than the shell's current directory. Preview responses use `Cache-Control: no-store, max-age=0` and
+ignore conditional cache validators, including for CSS. Port 8765 gives the preview a new origin
+from the old port-8000 server. This avoids old preview caching; it is development-only tooling,
+not a production hosting change. Stop with Ctrl+C.
+
+For a real phone, connect it and the computer to the same Wi-Fi, then run:
+
+```sh
+python3 web/tools/preview.py --lan
+```
+
+Find the computer's Wi-Fi IPv4 address in its network settings (`hostname -I` also lists candidate
+addresses; select the Wi-Fi address rather than a Docker/VPN address). On the phone open
+`http://<computer-Wi-Fi-IP>:8765/`, for example `http://192.168.1.20:8765/`. Use the computer's
+address, not the phone's localhost. LAN mode serves only `web/site/` at `/`; it does not serve tests,
+docs or owner reference material. Test portrait/landscape, Menu and every legal-page link, readable
+text, image fit and horizontal scrolling. If unreachable, check the Wi-Fi permits device-to-device
+traffic and the computer firewall allows this port. Stop the server with Ctrl+C when finished.
+
+For a desktop approximation, open Chrome DevTools (F12), toggle its device toolbar, choose
+Responsive, test 320/375/425/768 widths and rotate. Firefox Responsive Design Mode uses Ctrl+Shift+M.
+Use [Chrome's device-mode guide](https://developer.chrome.com/docs/devtools/device-mode) for details;
+emulation is not a substitute for a real phone test.
+
+An owner report on 2026-10-13 says the old HTTP preview rendered incorrectly while opening
+`index.html` directly rendered correctly. The precise server command/URL and HTTP error have not yet
+been supplied. Stale CSS or an incorrect served path are possibilities, not an established cause.
+If the uncached preview still differs, inspect Network for `site.css` (HTTP 200, `text/css`) and
+missing assets, and record the exact command/URL. Direct file opening is useful for static layout
+but does not verify ES modules and interaction behavior; final checks use HTTP.
+
+## Guest browser and sandbox policy
+
+Owner requirement, 2026-10-13: automated/headless Chrome always uses `--guest` and a new, unique
+profile directory under `web/.artifacts/` for each launch. Never attach to an existing personal
+Chrome or use normal tabs, cookies, history or logins. A dedicated profile was used in prior runs,
+but some runs reused that automation profile and did not specify Guest mode; archived commands are
+historical evidence and must not be reused unchanged. Future invocations must follow this policy.
+
+Chromium [defines the Guest switch](https://chromium.googlesource.com/chromium/src/+/HEAD/chrome/common/chrome_switches.h)
+and [documents its sandbox](https://www.chromium.org/developers/design-documents/sandbox/).
+Keep the browser's sandbox enabled; never pass `--no-sandbox`, `--disable-setuid-sandbox` or equivalent
+flags. Profile isolation, Guest mode and the execution environment's sandbox are separate boundaries.
+If the environment blocks a browser, report the failure and obtain any required tool escalation
+approval without disabling Chromium's sandbox. Store its temp/config/cache/report/crash output inside
+the unique repository-local run directory, and close only the process started for that run.
+
+Example launch pattern, from the repository root (future browser verification, not run in this update):
+
+```sh
+mkdir -p web/.artifacts
+web_qa_run=$(mktemp -d "$PWD/web/.artifacts/guest-run-XXXXXX")
+mkdir -p "$web_qa_run/tmp" "$web_qa_run/config" "$web_qa_run/cache" "$web_qa_run/crashes"
+env TMPDIR="$web_qa_run/tmp" XDG_CONFIG_HOME="$web_qa_run/config" XDG_CACHE_HOME="$web_qa_run/cache" \
+  google-chrome --guest --headless --disable-gpu --disable-dev-shm-usage \
+  --disable-breakpad --disable-crash-reporter --disable-background-networking \
+  --disable-component-update --no-first-run --no-default-browser-check \
+  --user-data-dir="$web_qa_run/profile" --disk-cache-dir="$web_qa_run/cache" \
+  --crash-dumps-dir="$web_qa_run/crashes" --virtual-time-budget=30000 \
+  --dump-dom http://127.0.0.1:8765/tests/browser.html \
+  > "$web_qa_run/report.html" 2> "$web_qa_run/browser.log"
+```
