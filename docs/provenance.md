@@ -7,7 +7,7 @@ screenshot, video and social image here before publication. Required licence not
 | Candidate | Source / current evidence | Rights and review | Public use |
 |---|---|---|---|
 | Layout reference | Owner-supplied `web/image-ref/web-design-layout.png`, inspected 2026-10-12 | Layout reference only; redistribution rights unknown | Excluded; never extract imagery or app screens |
-| Existing branding | [Branding register](../../design/branding/README.md) | Author/distribution rights unrecorded | Launch blocked until confirmation; do not mark approved |
+| Existing branding | [Branding register](../../design/branding/README.md) | Author/distribution rights unrecorded | Master selected for website header by owner on 2026-10-13; details below |
 | Native screenshots | [Screen register](../../design/screens/README.md), `design/screens/manifest.json` | Must inspect revision, synthetic data and obsolete paid/locked UI | No screenshot selected yet |
 | Hero photo | Mikhail Nilov / Pexels 7500034; details below | Pexels licence reviewed; owner approved 2026-10-12 | Local layout asset |
 | Demo poster | Not selected | Review due WEB-04 if needed | No public asset |
@@ -145,3 +145,21 @@ rights is made. No attribution is required for the original geometry; font files
 
 The social image uses intended absolute production URLs in metadata; this does not establish
 hosting or launch. Existing hero and screenshot bytes and provenance remain unchanged.
+
+
+## WEB-06 owner-selected project logo (2026-10-13)
+
+The owner verified the Android icon, identified `design/branding/icon-master.png` as the project logo,
+and explicitly instructed its use before the first GoHealaX text. The four indexable page headers
+now use `site/assets/project-logo.png`, copied byte-for-byte from that master, without cropping,
+resizing, retouching or conversion. Native resources and the master are unchanged. Intrinsic dimensions
+are 1254×1254; CSS displays the logo at 2.75rem square with `object-fit: contain`. It loads eagerly
+and has empty alt text because the adjacent linked GoHealaX text supplies the accessible name.
+
+Original and delivered SHA-256:
+`be700fb51c492f59611666b738dcd8a66213da8360de669e2c4a3056414bb8aa`.
+The owner authorizes this website placement and identifies the artwork as the project logo. Authorship
+and distribution licence remain unrecorded in the shared branding register; this instruction does
+not invent a licence or establish external publication. WEB-07 remains the publication gate.
+The older CSS “g” header mark is replaced. WEB-05 favicon/touch/social assets retain their previously
+recorded provenance; the requested change is to the leading header logo.

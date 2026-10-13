@@ -9,6 +9,15 @@ export function initNavigation(root = document, { matchMedia } = {}) {
   const win = root.defaultView;
   const media = (matchMedia || win.matchMedia.bind(win))('(min-width: 48rem)');
   let open = false;
+  function measureHeader() {
+    if (header.classList.contains('site-header')) {
+      root.documentElement.style.setProperty('--header-height', `${header.getBoundingClientRect().height}px`);
+    }
+  }
+  if (header.classList.contains('site-header') && win.ResizeObserver) {
+    const observer = new win.ResizeObserver(measureHeader);
+    observer.observe(header);
+  }
   function render() {
     if (media.matches) {
       nav.hidden = false;
@@ -20,6 +29,7 @@ export function initNavigation(root = document, { matchMedia } = {}) {
       nav.hidden = !open;
     }
     button.setAttribute('aria-expanded', String(media.matches || open));
+    measureHeader();
   }
   function close() { open = false; render(); }
   button.addEventListener('click', () => { open = !open; render(); });

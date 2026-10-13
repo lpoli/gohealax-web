@@ -35,7 +35,9 @@ class PreviewHandler(SimpleHTTPRequestHandler):
         super().end_headers()
 
 
-def preview_settings(lan=False, root=False):
+def preview_settings(lan=False, root=False, exported=False):
+    if exported:
+        return "127.0.0.1", WEB / ".release/site"
     if root:
         return "127.0.0.1", WEB / "site"
     return ('0.0.0.0', WEB / 'site') if lan else ('127.0.0.1', WEB)
@@ -46,16 +48,19 @@ def main():
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument('--lan', action='store_true', help='Allow phone access; serve only web/site at /')
     modes.add_argument('--root', action='store_true', help='Serve website at origin root with custom nested 404 responses')
+    modes.add_argument('--exported', action='store_true', help='Serve web/.release/site at / with custom nested 404 responses')
     parser.add_argument('--port', type=int, default=8765)
     args = parser.parse_args()
-    bind, directory = preview_settings(args.lan, args.root)
-    PreviewHandler.fallback_404 = args.root or args.lan
+    bind, directory = preview_settings(args.lan, args.root, args.exported)
+    if not directory.is_dir() or ((args.root or args.lan or args.exported) and not (directory / '404.html').is_file()):
+        parser.error('website package missing; export first for --exported')
+    PreviewHandler.fallback_404 = args.root or args.lan or args.exported
     handler = partial(PreviewHandler, directory=str(directory))
     with ThreadingHTTPServer((bind, args.port), handler) as server:
         if args.lan:
             print(f'Phone preview: http://<computer-Wi-Fi-IP>:{server.server_port}/', flush=True)
             print('Website files only. Stop with Ctrl+C.', flush=True)
-        elif args.root:
+        elif args.root or args.exported:
             print(f'Website and nested 404: http://127.0.0.1:{server.server_port}/', flush=True)
         else:
             print(f'Website: http://127.0.0.1:{server.server_port}/site/', flush=True)

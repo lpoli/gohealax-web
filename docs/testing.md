@@ -189,3 +189,26 @@ four real content pages. This automated enlargement does not replace manual brow
 400% zoom, screen-reader or real-mobile checks. Lighthouse is owner-run through the DevTools method
 above; record version, Mobile/Desktop results and save both reports. Current evidence is in the
 [handoff](handoff.md#web-05-quality-and-review).
+
+
+## WEB-06 package checks
+
+The offline suite adds exporter allowlist/exclusion, links/escapes, symlinks, staging/replacement
+failure, stale removal, byte equality, deterministic manifest and saved-package rollback checks.
+Temporary fixture trees are created exclusively under `web/.artifacts/` and removed after tests.
+
+```sh
+python3 web/scripts/prepare-release.py --check
+python3 web/scripts/prepare-release.py
+sha256sum web/.release/manifest.json
+python3 web/tools/preview.py --port 8000
+# Separate terminal: root export preview with actual nested fallback
+python3 web/tools/preview.py --exported --port 8001
+```
+
+Open `http://127.0.0.1:8000/tests/browser.html` for the shared suite and inspect all exported pages
+at port 8001, including `/404.html` and `/unknown/nested/page`. The suite exercises source pages;
+byte equality tests tie those results to the export. Exported root rendering is checked separately.
+`--exported`, `--root` and `--lan` are mutually exclusive. Export preview fails clearly if the package
+is missing. Saved package restore commands and future publication/rollback are in
+[deployment](deployment.md#retain-and-restore-a-reviewed-package). Nothing here publishes or changes DNS.

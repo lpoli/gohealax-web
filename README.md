@@ -7,7 +7,7 @@ Decision: [ADR-0008](../docs/decisions/0008-static-informational-website.md).
 Start with [Web instructions](AGENTS.md), [roadmap](docs/roadmap.md) and [handoff](docs/handoff.md).
 The roadmap owns the seven approval gates. WEB-02 replaces the homepage redirect with an owner-approved responsive landing page. WEB-03
 product/About copy and screenshot gallery were approved on 2026-10-13. WEB-04 navigation, media
-support and legal pages and WEB-05 quality were approved on 2026-10-13. WEB-06 export preparation is next. Later
+support and legal pages and WEB-05 quality were approved on 2026-10-13. WEB-06 release preparation was approved on 2026-10-13; WEB-07 is next. Later
 increments follow the roadmap gates.
 
 ## Source and documentation

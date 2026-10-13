@@ -522,3 +522,179 @@ Agent-run approval handoff validation, 2026-10-13: `python3 -m unittest discover
 -p 'test_*.py'` PASS (39 tests); `python3 web/tests/audit.py` PASS (0 findings);
 `python3 scripts/check-doc-links.py` PASS (91 Markdown files); `git diff --check` PASS.
 Browser automation was not repeated for these documentation-only approval updates.
+
+
+## WEB-06 release preparation
+
+Started 2026-10-13 at the owner's request, on clean `web-development` revision
+`af4d09aa59d41a5d6ea7b6b0f5eb25ec975d782a` (committed WEB-05). Implementation changes are uncommitted;
+that is the base revision, not an approved launch revision. No publication, push, repository mutation
+or DNS change occurred. WEB-06 status is owned by [roadmap](roadmap.md).
+
+Implemented the standard-library exporter, literal 23-file allowlist, exact `CNAME` and empty
+`.nojekyll`, validation-only `--check`, staged byte-preserving replacement, sorted deterministic
+path/size/SHA-256 manifest outside the public directory, and validated repository-local saved-package
+restore. Exclusions and symlink/reference safety, failed copy/replacement, changed staged bytes,
+stale removal and previous-package rollback are regression tested. No deployable content, photo,
+screenshot or artwork bytes changed beyond the two hosting markers. `preview.py --exported` serves
+the actual package at origin root with the actual custom nested 404. The deployment guide owns the
+precise allowlist, replacement/crash limits and owner publication/rollback procedure.
+
+Candidate manifest SHA-256:
+`16535334fcc817f08c5067e9df3aeb41b873cdaa784a498321089d248d0c87c4`.
+Output: `web/.release/site/` and `web/.release/manifest.json`.
+Retained byte-identical candidate: `web/.artifacts/releases/` followed by the full hash above.
+Snapshots/reports remain ignored. The manifest contains no time, machine path, Git state or credentials.
+Owner review must identify this exact hash; an eventual committed monorepo revision must also be
+recorded before launch. This candidate is locally verified, not launch-ready or publication-approved.
+
+Agent-run verification on Linux, 2026-10-13:
+
+| Command / check | Result |
+|---|---|
+| `python3 -m unittest discover -s web/tests -p 'test_*.py'` | PASS: 49 tests |
+| `python3 web/tests/audit.py` | PASS: zero findings |
+| `python3 scripts/check-doc-links.py` | PASS: 91 Markdown files |
+| `python3 web/scripts/prepare-release.py --check` | PASS: 23 files; validation only |
+| `python3 web/scripts/prepare-release.py` | PASS; candidate hash above |
+| `sha256sum web/.release/manifest.json` | Hash above |
+| `python3 web/scripts/prepare-release.py --restore web/.artifacts/releases/16535334fcc817f08c5067e9df3aeb41b873cdaa784a498321089d248d0c87c4 --check` | PASS |
+| Same restore command without `--check` | PASS; original candidate/hash retained |
+| `python3 web/tools/preview.py --port 8000` | Source/browser preview |
+| `python3 web/tools/preview.py --exported --port 8001` | Export root and nested custom fallback |
+| `node web/.artifacts/web06-check.mjs` | Chrome 154.0.8037.92 Guest: 47 PASS / 0 FAIL / 0 TIMEOUT / 0 SKIP |
+| Export root browser inspection | All four indexable pages, `/404.html`, and `/unknown/nested/page`: CSS loaded, focused skip links visible, no overflow or failed network loads; same-origin page requests only |
+| `git diff --check` | PASS |
+
+Browser evidence: `web/.artifacts/qQ1HbAz/browser.json`, route JSON and `network.json`.
+The shared browser suite exercised source pages; exporter tests prove the exported files match those
+bytes. The same fresh Guest browser separately inspected all exported root routes and the fallback.
+Offline HTTP-handler tests assert HTTP 404 and exact fallback body, plus HTTP 200 for exported pages
+and assets. Regression tests install a previous saved package after a changed candidate and verify
+all prior bytes/manifest return. No real phone or assistive-tool rerun was performed in WEB-06;
+website page bytes are unchanged from owner-approved WEB-05.
+
+The execution sandbox rejected preview sockets and the initial Chrome startup timed out. Necessary
+reruns received explicit tool escalation approval. Chrome retained its own sandbox, used Guest and a
+fresh repository-local profile; no personal browser was attached. Reports/profiles remain in the
+workspace. Both agent-owned preview servers were stopped after verification.
+
+### Launch prerequisites and owner review
+
+- Owner identified the dedicated public repository as **`lpoli/gohealax`** in this session. A read-only
+  web fetch of its GitHub URL failed with cache miss; visibility, existence, access, existing history,
+  `main` and Pages settings were not independently established. Confirm it is separate from the
+  private monorepo before following the concrete owner commands in deployment.
+- Authoritative existing hosting, DNS records/provider and domain-control authority are still unknown.
+  No live DNS snapshot or HTTPS/redirect result is claimed. Obtain apex/`www`/NS/MX/TXT records and
+  a routing rollback plan under owner authority before launch.
+- Hero licence, screenshot synthetic-data review and original-artwork authorship remain documented in
+  [provenance](provenance.md). Local milestone approvals are recorded; explicit public-use confirmation
+  for selected screenshots/original artwork was requested but has not been supplied. Native branding
+  and completion fanfare are absent from this package; their native-release blockers do not add
+  assets to the website. Do not call this package launch-ready until selected-asset rights are resolved.
+- Google Play availability remains unverified. The exported download state is still truthful,
+  disabled pending availability. Contact remains `b.lp.self@gmail.com`; owner should verify it is
+  suitable before publishing. No invented store URL was added.
+- Current official GitHub branch/root and custom-domain guidance was rechecked read-only on
+  2026-10-13; exact links, current planned routing and future commands are in deployment.
+
+Inspect the manifest, all exported routes, licence/contact/download state and exclusions. Approve
+or reject this exact candidate, and resolve the launch prerequisites above. Package approval does
+not grant publication/DNS authority or start WEB-07 automatically.
+[Web instructions](../AGENTS.md) require “Stop for owner inspection after each milestone.”
+WEB-06 is therefore Awaiting approval after local implementation and available verification;
+missing authority/rights remain explicit blockers to launch.
+
+
+### WEB-06 owner-requested persistent navigation
+
+On 2026-10-13 the owner requested navigation that stays visible while scrolling and looks consistent
+between pages, allowing a 404 exception. The shared four-page header now uses identical branding,
+link labels/order/destinations and button styling; current-page links use `aria-current="page"`.
+It is sticky with an opaque background, with a persistent disclosure button on mobile. Header height
+is limited to half the viewport, with internal scrolling for long menus/enlarged text. Root scroll
+padding tracks actual header height after enhancement, with a CSS-only fallback, so section/skip
+navigation clears the header. The 404 retains its simpler header; legal content keeps its narrow
+reading column. No copy, asset or availability changes were made.
+
+The original WEB-06 package/hash above is now historical and retained for rollback. **Current review
+candidate:** `c7bd4c36ef8d471520206f74d2b8a2c868fd79eaa551c0582aa479c2cf6df562`.
+It is exported at `web/.release/` and retained under `web/.artifacts/releases/` with that hash as its
+directory name. Publication commands in deployment now select this candidate. Launch prerequisites
+and owner approval remain pending; changes remain uncommitted on the same base revision.
+
+Agent-run final verification: 49 offline tests PASS; audit zero findings; documentation links PASS;
+`prepare-release.py --check` PASS; export has 23 files and the current manifest hash above;
+`git diff --check` PASS. Chrome 154.0.8037.92, Linux, fresh Guest profile with sandbox enabled:
+**55 PASS / 0 FAIL / 0 TIMEOUT / 0 SKIP**, including sticky position after scrolling, usable mobile
+menus and unobscured section targets at 375px and 1440px on every indexable page. The shared
+navigation check now compares ordered label/destination pairs across all four pages.
+The export root and nested 404 inspection also passed. Latest browser evidence is recorded below.
+Real-phone, assistive-tool and Lighthouse checks were not repeated for this requested UI revision.
+
+Review with `python3 web/tools/preview.py --exported --port 8001`; inspect scrolling on each content
+page and cross-page section links. The deployment gate still requires review of this exact refreshed
+package. Both verification previews were stopped after the final checks.
+
+Final revised-navigation browser evidence: `web/.artifacts/qi9EptJ/browser.json`, route JSON,
+`network.json` and `cross-page-anchor.json`. In the exported browser, clicking Features from About
+navigated to `index.html#features` with the target below the sticky header. All observed exported
+page requests stayed same-origin and had no network loading failures.
+
+
+### WEB-06 owner-selected project logo
+
+On 2026-10-13 the owner verified the Android/master icon and instructed use of
+`design/branding/icon-master.png` before the leading GoHealaX text, identifying it as the project
+logo. The four content-page headers now display `assets/project-logo.png`, an unchanged copy of
+that master, at 2.75rem square. Empty alt text avoids repeating the adjacent accessible brand name;
+explicit intrinsic dimensions and eager loading reserve its layout space. The 404 exception retains
+its simpler header. Asset provenance and the precise owner authorization are in
+[provenance](provenance.md#web-06-owner-selected-project-logo-2026-10-13).
+
+**Current candidate superseding both prior WEB-06 packages:**
+`9a2b92b3757712d130d1f2205c41bce36fa6a7c0e296628b253dc3730fd21aef`.
+The exporter now allows 24 files, including `assets/project-logo.png`. The package is exported at
+`web/.release/`, retained under the full hash in `web/.artifacts/releases/`, and selected by the
+future publication commands. Prior packages remain available for rollback. This is still awaiting
+owner review, with no publication/push/DNS changes and no new committed revision.
+
+Agent-run checks: 49 offline tests PASS; audit zero findings; exporter validation PASS; manifest hash
+matches the current candidate; documentation links and whitespace PASS. Browser evidence is below.
+Mobile/assistive-tool/Lighthouse checks were not repeated for this logo change. Website logo bytes
+match the master's SHA-256 `be700fb51c492f59611666b738dcd8a66213da8360de669e2c4a3056414bb8aa`.
+Both agent-owned previews were stopped after verification. The current package can be inspected with
+`python3 web/tools/preview.py --exported --port 8001`.
+
+Final logo browser evidence: `web/.artifacts/qk22yOm/browser.json`, route JSON, `network.json`
+and `cross-page-anchor.json`: Chrome 154.0.8037.92 on Linux, fresh Guest with sandbox enabled,
+55 PASS / 0 FAIL / 0 TIMEOUT / 0 SKIP. Header logo images decoded in real-page/200% text checks;
+export root pages, nested 404 and the cross-page Features anchor inspection also passed.
+Saved-package restore accepts the retained pre-logo 23-file packages as well as the new 24-file
+package, checking the saved manifest and references; normal source export requires the logo.
+
+
+## WEB-06 owner approval
+
+On 2026-10-13 the owner reported: “All looks good. I approve WEB-06.” This explicitly approves
+the final local package with the persistent consistent navigation and owner-selected project logo.
+Approved manifest SHA-256:
+`9a2b92b3757712d130d1f2205c41bce36fa6a7c0e296628b253dc3730fd21aef`.
+The 24-file package at `web/.release/` matches the retained snapshot in
+`web/.artifacts/releases/9a2b92b3757712d130d1f2205c41bce36fa6a7c0e296628b253dc3730fd21aef/`.
+This is user-reported visual acceptance; exact browser/device details were not supplied. The
+agent-run evidence remains 49 passing offline tests, zero audit findings and 55 passing isolated
+Guest Chrome checks, recorded above. No browser checks were repeated for this documentation-only
+approval update.
+
+WEB-06 is Complete in the Web roadmap. WEB-07 is next and has not started. Package approval does
+not grant publication or DNS authority. Repository access/visibility, authoritative existing
+hosting/DNS and publication-rights evidence remain launch prerequisites recorded above. No push,
+publication or DNS changes occurred. WEB-06 implementation is still uncommitted, based on
+`af4d09aa59d41a5d6ea7b6b0f5eb25ec975d782a`; record the eventual commit as the approved source
+revision before publication. The owner requested a commit message, not creation of a commit.
+
+Approval handoff validation: `python3 web/scripts/prepare-release.py --check` PASS (24 files,
+approved hash); `python3 scripts/check-doc-links.py` PASS (91 Markdown files);
+`git diff --check` PASS. Approval documentation does not change package bytes.

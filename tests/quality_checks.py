@@ -80,8 +80,9 @@ def quality_issues(root=SITE):
             except (ValueError, KeyError, OSError, struct.error):
                 issues.append('valid image dimensions required')
             hero = 'hero-' in attrs.get('src', '')
-            if attrs.get('loading') != ('eager' if hero else 'lazy'):
-                issues.append('hero must be eager and below-fold images lazy')
+            logo = 'brand-logo' in attrs.get('class', '').split()
+            if attrs.get('loading') != ('eager' if hero or logo else 'lazy'):
+                issues.append('hero/header logo must be eager and below-fold images lazy')
             if hero and (not attrs.get('srcset') or not attrs.get('sizes') or attrs.get('fetchpriority') != 'high'):
                 issues.append('responsive high-priority hero required')
         add(route, issues)

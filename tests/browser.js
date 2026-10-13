@@ -57,11 +57,11 @@ test('Landing homepage is retrievable and its HTML link target resolves', async 
     .every(id => doc.getElementById(id)), 'landing section missing');
 });
 
-test('Landing, About and Privacy navigation destinations agree', async signal => {
+test('All content pages share navigation labels, order and destinations', async signal => {
   const routes = [];
   for (const route of contentRoutes) {
     const doc = await fetchPage(`../site/${route}`, signal);
-    routes.push([...doc.querySelectorAll('nav a[href]')].map(a => a.getAttribute('href')).sort());
+    routes.push([...doc.querySelectorAll('nav a[href]')].map(a => [a.textContent.trim(), a.getAttribute('href')]));
   }
   assert(routes[0].length > 0, 'no navigation destinations');
   assert(routes.every(links => JSON.stringify(links) === JSON.stringify(routes[0])), 'navigation differs');
@@ -281,6 +281,31 @@ test('Production YouTube adapter uses privacy-enhanced embed only on creation', 
     remove(); assert(!mount.children.length, 'iframe removal');
   }, { srcdoc: true });
 });
+for (const route of contentRoutes) {
+  for (const width of [375, 1440]) {
+    test(`${route}: persistent shared header at ${width}px`, async signal => {
+      await withFrame(`../site/${route}`, width, signal, async (doc, win) => {
+        initNavigation(doc);
+        const header = doc.querySelector('header');
+        win.scrollTo(0, 500);
+        await new Promise(resolve => win.requestAnimationFrame(() => win.requestAnimationFrame(resolve)));
+        assert(win.scrollY > 0, 'page did not scroll');
+        assert(Math.abs(header.getBoundingClientRect().top) < 1, 'header left viewport');
+        assert(header.getBoundingClientRect().height <= win.innerHeight / 2 + 1, 'header obscures content');
+        const button = header.querySelector('button');
+        if (width < 768) { button.click(); assert(!header.querySelector('nav').hidden, 'menu unavailable after scroll'); }
+        else assert(!header.querySelector('nav').hidden, 'desktop navigation hidden');
+        // Simulate closing the menu before jumping to content; targets clear the measured header.
+        if (width < 768) button.click();
+        const target = doc.querySelector(route === 'index.html' ? '#features' : 'main');
+        target.scrollIntoView();
+        await new Promise(resolve => win.requestAnimationFrame(resolve));
+        assert(target.getBoundingClientRect().top >= header.getBoundingClientRect().bottom - 1,
+          'anchor target hidden behind header');
+      });
+    });
+  }
+}
 for (const route of contentRoutes) {
   test(`${route}: production enhancement on real mobile markup`, async signal => {
     await withFrame(`../site/${route}`, 375, signal, async doc => {

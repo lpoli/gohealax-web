@@ -1,5 +1,6 @@
 :root {
   color-scheme: light;
+  --accent: #135c4c;
   --ink: #173b3d;
   --muted: #527073;
   --surface: #ffffff;
@@ -91,15 +92,15 @@ footer { padding-bottom: 2rem; color: var(--muted); font-size: 0.9rem; }
 .landing h3 { line-height: 1.3; }
 .landing .eyebrow { letter-spacing: 0.1em; }
 .landing .section { padding-block: clamp(2.5rem, 6vw, 5rem); }
-.landing section { scroll-margin-top: 1rem; }
+html { scroll-padding-top: calc(var(--header-height, min(24rem, 50svh)) + 1rem); }
 .visually-hidden, .skip-link:not(:focus) { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.skip-link:focus { clip-path: none; width: auto; height: auto; white-space: normal; position: absolute; z-index: 10; left: 1rem; top: 1rem; padding: 1rem; background: white; }
+.skip-link:focus { clip-path: none; width: auto; height: auto; white-space: normal; position: fixed; z-index: 30; left: 1rem; top: 1rem; padding: 1rem; background: white; }
 
 /* Layout */
-.landing .site-header { padding-block: 1.5rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 2rem; }
-.landing nav { gap: 0.7rem 1rem; align-items: center; margin: 0; }
-.landing nav a { font-size: 0.875rem; text-decoration: none; font-weight: 650; }
-.landing nav a:hover { text-decoration: underline; }
+.site-header { padding-block: 1.5rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 2rem; }
+.site-header nav { gap: 0.7rem 1rem; align-items: center; margin: 0; }
+.site-header nav a { font-size: 0.875rem; text-decoration: none; font-weight: 650; }
+.site-header nav a:hover { text-decoration: underline; }
 .landing main { margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .landing .hero { display: grid; background: #eff5f1; border-radius: 1.5rem; overflow: hidden; }
 .landing .hero-copy { padding: clamp(1.5rem, 4vw, 3.5rem); align-self: center; }
@@ -117,11 +118,11 @@ footer { padding-bottom: 2rem; color: var(--muted); font-size: 0.9rem; }
 .landing .contact { display: flex; flex-wrap: wrap; gap: 1rem 3rem; align-items: center; justify-content: space-between; }
 
 /* Components */
-.landing .brand { display: inline-flex; align-items: center; gap: 0.5rem; }
-.landing .brand-mark { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--accent); color: white; font-family: Georgia, serif; font-size: 1.6rem; font-style: italic; line-height: 1; }
-.landing .button { padding: 0.75rem 1.25rem; border-color: var(--accent); }
-.landing .primary { background: var(--accent); color: white; }
-.landing .primary:hover, .landing .primary:focus-visible { background: #0c483b; }
+.landing .brand, .site-header .brand { display: inline-flex; align-items: center; gap: 0.5rem; }
+.site-header .brand-logo { display: block; width: 2.75rem; height: 2.75rem; object-fit: contain; flex-shrink: 0; }
+.landing .button, .site-header .button { padding: 0.75rem 1.25rem; border-color: var(--accent); }
+.landing .primary, .site-header .primary { background: var(--accent); color: white; }
+.landing .primary:hover, .landing .primary:focus-visible, .site-header .primary:hover, .site-header .primary:focus-visible { background: #0c483b; }
 .landing .availability { font-size: 0.8rem; color: #36524c; margin-top: 1rem; }
 .landing .step { display: inline-block; color: var(--accent); font-size: 0.8rem; border-bottom: 2px solid #a8d2c5; padding-bottom: 0.3rem; }
 .landing .demo-placeholder { margin-top: 2rem; padding: clamp(2rem, 8vw, 5rem) 1.5rem; text-align: center; border: 1px solid var(--line); border-radius: 1rem; background: radial-gradient(ellipse at top, #e0eee8, #f3f7f4); }
@@ -153,7 +154,7 @@ footer { padding-bottom: 2rem; color: var(--muted); font-size: 0.9rem; }
   .landing .platforms { grid-template-columns: 1fr 1fr; }
 }
 @media (min-width: 64rem) {
-  .landing .site-header { justify-content: space-between; }
+  .site-header { justify-content: space-between; }
   .landing .benefit-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .landing .download { grid-template-columns: 1.3fr 1fr; align-items: center; }
   .landing .platforms { grid-template-columns: 1fr; }
@@ -182,7 +183,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--leaf-dark); out
 .landing .demo-poster { display: block; width: min(100%, 180px); height: auto; margin: 0 auto 1rem; border-radius: 0.5rem; }
 .media-player iframe, .media-player video { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; margin-top: 1rem; }
 @media (max-width: 47.999rem) {
-  .landing .site-header nav { flex-basis: 100%; }
+  .site-header nav { flex-basis: 100%; }
 }
 
 /* WEB-05: reflow and focus remain readable on every page at enlarged text sizes. */
@@ -195,3 +196,17 @@ nav a { min-height: 44px; display: inline-flex; align-items: center; }
 @media (forced-colors: active) {
   a:focus-visible, button:focus-visible { outline-color: Highlight; }
 }
+
+/* Shared persistent header: legal content retains its readable narrow column. */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  width: 100%;
+  padding: 0.75rem max(1rem, calc((100% - 72rem) / 2));
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  max-height: min(24rem, 50svh);
+  overflow-y: auto;
+}
+.site-header nav a[aria-current="page"] { text-decoration: underline; text-underline-offset: 0.3em; }

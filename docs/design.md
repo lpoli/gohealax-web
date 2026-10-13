@@ -20,8 +20,10 @@ CSS or original SVG with no accessible name. Never use fixed section heights tha
 
 `web/site/` is the entire public source. Keep shared header/footer markup directly in the small set
 of pages and test destination consistency. No runtime includes or templates. CSS sections: tokens,
-base styles, layout, components, responsive overrides. Scope landing styles under a landing-specific
-class so legal-page layout remains readable.
+base styles, layout, components, responsive overrides. Scope landing content styles under a landing-specific
+class so legal-page layout remains readable. The four indexable pages share the same full-width
+header, owner-selected project logo followed by GoHealaX text, controls, link labels/order/destinations and button styling. Mark the current page
+with `aria-current="page"`; the 404 may retain its simpler header.
 
 | URL | Role | Canonical |
 |---|---|---|
@@ -44,7 +46,14 @@ HTML starts with visible native navigation links. WEB-02 must work without JavaS
 collapses mobile navigation only after setup succeeds. Use `aria-expanded` and `aria-controls`,
 native Tab order, no application-menu roles, no focus trap. Escape closes and focuses the button;
 link activation closes without cancelling navigation. On resize, never hide the focused element
-without moving focus to an appropriate visible control. Desktop navigation remains visible.
+without moving focus to an appropriate visible control. Desktop navigation remains visible. The shared header sticks to the viewport top on scroll, with
+an opaque background. Mobile retains its persistent Menu button and disclosure behavior. At short
+viewport heights or enlarged text, the header occupies at most half the viewport and its links can
+scroll within it. Content remains reachable with JavaScript disabled.
+
+`site.js` measures header height on disclosure/resize changes; root scroll padding keeps section
+and skip targets below it. A conservative CSS fallback handles navigation before enhancement or
+without scripts. Focused skip links stay above the header even after scrolling.
 
 Basis: [WAI disclosure navigation guidance](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/),
 reviewed 2026-10-12 and rechecked 2026-10-13. Test our implementation and assistive-technology behavior; do not copy the example
