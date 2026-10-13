@@ -9,7 +9,7 @@ status. Acceptance details live in the linked milestone files; evidence and bloc
 |---|---|---|---|
 | [WEB-01](milestones/WEB-01.md) | Foundation, complete milestone documentation and baseline checks | Complete | Approved 2026-10-12; see [handoff](handoff.md#owner-review-and-next-action) |
 | [WEB-02](milestones/WEB-02.md) | Responsive landing-page layout and licensed imagery | Complete | Approved 2026-10-12; see [handoff](handoff.md#web-03-startup-and-verification). Unrun manual checks remain recorded |
-| [WEB-03](milestones/WEB-03.md) | Product content, About and reviewed screenshots | Awaiting approval | Pending: owner wording/gallery/editing-location review; see [handoff](handoff.md#web-03-startup-and-verification) |
+| [WEB-03](milestones/WEB-03.md) | Product content, About and reviewed screenshots | Complete | Approved 2026-10-13; see [handoff](handoff.md#web-03-owner-approval) |
 | [WEB-04](milestones/WEB-04.md) | Disclosure navigation, optional media and legal pages | Not started | Pending |
 | [WEB-05](milestones/WEB-05.md) | Accessibility, performance, metadata and 404 | Not started | Pending |
 | [WEB-06](milestones/WEB-06.md) | Deterministic export and release preparation | Not started | Pending |

@@ -1,17 +1,18 @@
 # Website handoff
 
-Updated: 2026-10-12. Milestone status and approval authority: [roadmap](roadmap.md).
+Updated: 2026-10-13. Milestone status and approval authority: [roadmap](roadmap.md).
 WEB-02 startup: clean `web-development` branch at `2a360fa`. WEB-01 history below retains its
 original evidence. WEB-02 was committed as `6c08b13`. WEB-03 began from that clean revision on
-`web-development`; its changes are uncommitted. Nothing pushed.
+`web-development`; it was committed as `5b1de39`. Approval documentation is uncommitted.
+Nothing pushed by the agent.
 
 ## Current increment
 
 WEB-01 established the documentation and verification baseline and was explicitly approved by the
 owner on 2026-10-12. All seven milestone descriptions were created before checker/runner
 implementation. WEB-02 replaces the index redirect with the responsive landing composition. Owner layout/imagery
-approval was granted explicitly on 2026-10-12. WEB-03 content and screenshot presentation are implemented; owner
-wording/gallery approval is pending. See the evidence below.
+approval was granted explicitly on 2026-10-12. WEB-03 content and screenshot presentation were explicitly approved on 2026-10-13.
+WEB-04 is eligible to start; it has not started. See the evidence below.
 
 ## WEB-03 startup and verification
 
@@ -95,10 +96,24 @@ Final visual artifacts: `web/.artifacts/gallery-check-6N6Jev/gallery-reviewed-mo
 `gallery-reviewed-desktop.png`, with corresponding JSON reports. Gallery originals, full-resolution
 review, layout inspection and example captions are complete. Normal browser tabs were not involved.
 
-**Owner review remains:** final wording, gallery and editable source locations. WEB-03 awaits approval;
+**At the implementation handoff:** owner review of final wording, gallery and editable source
+locations was pending. The approval below resolves that milestone gate;
 WEB-04 has not started. Firefox, real mobile, manual keyboard/assistive, zoom/orientation, DevTools
 Network/console and Lighthouse checks remain not run. No native build/device test, publication or DNS
 change occurred. Preview server stopped at handoff.
+
+## WEB-03 owner approval
+
+Owner approval, 2026-10-13 (user-reported): “I approve WEB-03.” This explicitly approves the
+implemented content and screenshot gallery at `5b1de39`. The roadmap records WEB-03 as Complete;
+WEB-04 is now eligible. No WEB-04 implementation or publication was performed in this approval update.
+
+The approval does not establish results for unrun manual/browser checks. The owner separately
+requested [Web todos](todos.md) after development: Schedules/History screenshots and a manual review
+of all webpage wording. These deferred tasks remain open; existing WEB-04/05/07 gates still apply.
+
+Approval update validation: `python3 scripts/check-doc-links.py` and `git diff --check` passed.
+Website source is unchanged, so browser/native tests were not rerun.
 
 ## WEB-02 verification and review
 
@@ -218,8 +233,8 @@ approves the foundation documentation and recorded baseline with its limits. Det
 and per-check manual results were not provided; later manual/release gates remain applicable.
 
 The approval is recorded in the roadmap. WEB-02 was subsequently implemented and committed as `6c08b13`, then explicitly approved on
-2026-10-12 as recorded above. WEB-03 is the current increment; finish screenshot acceptance and
-owner review before WEB-04. The seven-milestone gate remains in force.
+2026-10-12 as recorded above. WEB-03 was committed as `5b1de39` and explicitly approved on 2026-10-13.
+WEB-04 is the next eligible increment. The seven-milestone gate remains in force.
 
 ## Blockers and owner inputs
 

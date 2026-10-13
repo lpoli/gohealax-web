@@ -96,7 +96,7 @@ Capture/build evidence:
 - Android 17 is the owner's tentative OS recollection, not independently verified; it is not the
   app version. No new native capture or device test was run by the agent.
 - Local website use is authorized by the owner's submission in this task. Final gallery acceptance
-  is pending WEB-03 approval; external publication remains gated on WEB-07. No blanket ownership
+  was granted with explicit WEB-03 approval on 2026-10-13; external publication remains gated on WEB-07. No blanket ownership
   or publication-rights claim is inferred for native branding.
 
 | Delivered filename | Original = delivered SHA-256 |
