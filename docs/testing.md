@@ -32,8 +32,8 @@ landing section order, no redirect, visible HTML links, honest availability and 
 assets; WEB-03 now enforces product explanations, availability, contributor/social editing locations and
 three-page navigation consistency. Screenshot asset hashes, equality to owner originals, PNG dimensions, alt text, lazy loading and
 example captions are enforced. Owner-reported build/fixture evidence lives in the provenance register; WEB-04 disclaimer and
-interaction cases; WEB-05 metadata, image dimensions, sitemap and complete route coverage. By WEB-05
-the audit must pass. WEB-06 adds exporter tests (including symlinks, reproducibility and stale files).
+interaction cases; WEB-05 metadata, image dimensions, sitemap and complete route coverage. The WEB-05 audit now passes and is enforced by `test_quality.py`, including adversarial
+metadata, image, missing-file, network-resource, sitemap and 404 fixtures. WEB-06 adds exporter tests (including symlinks, reproducibility and stale files).
 
 ## Browser runner
 
@@ -85,7 +85,7 @@ page route. HTTP errors remain failures. The browser regression verifies repeate
 freshness, current HTML, original relative asset resolution and missing-page failure.
 
 After changing the runner itself, hard-refresh `/tests/browser.html` once (Ctrl+Shift+R on Linux
-Chrome) to load the updated test modules. Current automated coverage is 42 cases; user rerun evidence
+Chrome) to load the updated test modules. Current automated coverage is 47 cases; user rerun evidence
 is separate from the agent's result in the handoff.
 
 ## Reliable local preview and phone inspection
@@ -160,3 +160,32 @@ env TMPDIR="$web_qa_run/tmp" XDG_CONFIG_HOME="$web_qa_run/config" XDG_CACHE_HOME
   --dump-dom http://127.0.0.1:8765/tests/browser.html \
   > "$web_qa_run/report.html" 2> "$web_qa_run/browser.log"
 ```
+
+
+## WEB-05 origin-root and nested 404 preview
+
+```sh
+python3 web/tools/preview.py --root --port 8766
+```
+
+Inspect `http://127.0.0.1:8766/`, all four indexable routes, `/404.html` and
+`http://127.0.0.1:8766/unknown/nested/page`. Missing paths return the actual site 404 HTML with
+HTTP 404, root-relative assets/navigation and noindex; successful assets keep HTTP 200. LAN mode
+also uses this fallback. The standard library handler is used otherwise, with unchanged uncached
+responses. Stop with Ctrl+C. `--root` and `--lan` are mutually exclusive. The browser runner remains
+at port 8765 in default preview mode. No cross-origin request is added to the runner; separate
+origin-root inspection verifies the fallback server. Repeat against the WEB-06 export later.
+
+On this host Chrome's Unix socket path limit requires short temporary paths: use a fresh
+`web/.artifacts/gXXXX` run directory and short `t`, `p`, `c`, `k`, `d` subdirectories instead of the
+long example above. Set `XDG_DATA_HOME` inside the run directory too, or use the actual Chrome binary
+(`/opt/google/chrome/chrome`) to avoid wrapper-created files outside the workspace. Guest headless
+`--dump-dom` yielded no report here. The verified run uses the new browser's `DevToolsActivePort`
+and its own blank Guest tab (`/json/list`); Guest rejected `/json/new` with HTTP 500. Enable `Emulation.setFocusEmulationEnabled` for focused-style inspection in the headless tab.
+Never connect to another instance. Keep the browser sandbox enabled and close only the browser started for the run.
+
+WEB-05 adds 200% root-font reflow, skip-link focusability and actual image decoding checks on the
+four real content pages. This automated enlargement does not replace manual browser text-only or
+400% zoom, screen-reader or real-mobile checks. Lighthouse is owner-run through the DevTools method
+above; record version, Mobile/Desktop results and save both reports. Current evidence is in the
+[handoff](handoff.md#web-05-quality-and-review).

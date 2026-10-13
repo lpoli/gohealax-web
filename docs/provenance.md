@@ -122,3 +122,26 @@ The disabled demo uses the existing byte-identical `running-timer-1.png` from th
 as its local poster, with an example-data caption. No video, captions, remote thumbnail or new
 bitmap is supplied or enabled. Media review attributes remain absent; future activation requires
 revision-specific video/caption/transcript rights and accessibility evidence here.
+
+## WEB-05 original quality assets (2026-10-13)
+
+Created by the coding agent in this repository for local website use. No native branding, reference
+pixels, photos or third-party icon paths used. The favicon is an original geometric circle/stem mark
+on teal; the PNG fallback and touch icon draw the same geometry with Pillow 12.2.0. The 1200×630
+social card uses original teal/mint geometry and factual GoHealaX copy. Text rasterized from the
+host's DejaVu Sans; licence evidence inspected in `/usr/share/doc/fonts-dejavu-core/copyright`
+(Bitstream Vera licence; DejaVu changes public domain). No font software is distributed or requested.
+Sources are simple SVG geometry and Pillow drawing, with no external image source/licence requirement.
+Generated on 2026-10-13; output dimensions/hashes below. Owner acceptance was recorded with WEB-05
+on 2026-10-13; external publication remains gated on WEB-07. No inference about native branding
+rights is made. No attribution is required for the original geometry; font files are not shipped.
+
+| Deployable asset | Dimensions | SHA-256 |
+|---|---|---|
+| `site/assets/favicon.svg` | 64×64 viewBox | `fbb78387a2173375d9dc1ffdb2289ab3a07fd6ec87c6cb37173462f6154f54d8` |
+| `site/assets/favicon.png` | 32×32 | `18f48b7d3046e04012fdea0b9034a5b6fa37d84a06ec5a625ab05dd56063a33d` |
+| `site/assets/apple-touch-icon.png` | 180×180 | `d8d4e3d6773b195127893028d9e4529dd0f118ba32cfe73b136962d1644c341f` |
+| `site/assets/social.png` | 1200×630 | `08a8e944fc0b5fb1bf4fe68d341ea700d1ae5998f33f28551f4c00554c2303d5` |
+
+The social image uses intended absolute production URLs in metadata; this does not establish
+hosting or launch. Existing hero and screenshot bytes and provenance remain unchanged.

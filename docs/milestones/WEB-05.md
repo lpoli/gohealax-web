@@ -35,7 +35,8 @@ python3 -m http.server 8001 --bind 127.0.0.1 --directory web/site
 
 At port 8000 open `/tests/browser.html`; at 8001 inspect all root routes. Run Lighthouse via Chrome
 DevTools → Lighthouse → Navigation, once Mobile and once Desktop, exporting reports inside
-`web/.artifacts/`. Add the nested-404 server command when implemented; Python's stock 404 is insufficient.
+`web/.artifacts/`. `python3 web/tools/preview.py --root --port 8766` serves the website at origin root and returns
+its custom 404 for unknown nested URLs; Python's stock 404 is insufficient.
 
 ## Manual gate and blockers
 

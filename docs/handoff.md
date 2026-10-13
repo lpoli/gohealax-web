@@ -12,7 +12,8 @@ WEB-01 established the documentation and verification baseline and was explicitl
 owner on 2026-10-12. All seven milestone descriptions were created before checker/runner
 implementation. WEB-02 replaces the index redirect with the responsive landing composition. Owner layout/imagery
 approval was granted explicitly on 2026-10-12. WEB-03 content and screenshot presentation were explicitly approved on 2026-10-13.
-WEB-04 implementation evidence and explicit owner approval are recorded below.
+WEB-04 implementation evidence and explicit owner approval are recorded below. WEB-05 quality
+implementation and pending manual evidence are recorded in [WEB-05 review](#web-05-quality-and-review).
 
 ## WEB-03 startup and verification
 
@@ -392,3 +393,132 @@ current CSS MIME type with conditional requests, plus LAN-root exclusion of docs
 Tests use in-memory HTTP connections without opening sockets. `python3 web/tools/preview.py --help`,
 documentation links and `git diff --check` PASS. Live server/browser/phone rendering has not been
 verified in this update. Changes are uncommitted; WEB-04 commit is `8f1b3be`.
+
+
+## WEB-05 quality and review
+
+Started on owner instruction “Start milestone WEB-05”, from clean `web-development` revision
+`51d7b04` (preview follow-up); WEB-04 predecessor approval is recorded above. Changes are uncommitted.
+No native changes, export, publication, DNS changes or push. Owner references and existing hero/
+screenshot bytes are untouched.
+
+Implemented:
+
+- Absolute canonical URLs on all four indexable pages; unique titles/descriptions, page-specific
+  Open Graph metadata and shared local social card. Original SVG/PNG favicons and touch icon;
+  candidate provenance, dimensions and SHA-256 are in [provenance](provenance.md#web-05-original-quality-assets-2026-10-13).
+- Sitemap containing exactly the four canonicals, crawl rules and absolute sitemap location.
+  Helpful noindex 404, no canonical, with root-relative navigation and assets. The loopback
+  origin-root preview returns these exact bytes and HTTP 404 for unknown nested URLs.
+- Skip links on legal pages and 404, explicit visible focus styling, text wrapping without a fixed
+  body minimum width, 44px navigation targets, reduced-motion and forced-colors focus support.
+  Numeric inspection found the small footer copy at 4.03:1 against mint; changed it to dark green,
+  now above 4.5:1, with a regression. Other sampled text/surface pairs were 4.95:1 or higher.
+- Mandatory complete static audit (`quality_checks.py`) shared by `audit.py` and the regression
+  suite. Adversarial fixtures check metadata, missing files, images, external resources, 404,
+  sitemap and robots failures. Existing hero responsive sources/eager priority and screenshot
+  explicit dimensions/lazy loading are preserved. No production dependencies or build step.
+- Browser suite grows from 42 to 47 cases: skip-link focusability, actual image decoding and
+  reflow at 320px with 200% root text on all four real pages; social image, sitemap and 404 HTML.
+  HTTP fallback-handler tests check custom 404 bytes/status plus root asset/navigation availability.
+
+Agent-run, Linux, 2026-10-13:
+
+| Exact command / check | Outcome |
+|---|---|
+| `python3 -m unittest discover -s web/tests -p 'test_*.py'` | PASS: 39 tests |
+| `python3 web/tests/audit.py` | PASS: 0 findings, exit 0 |
+| `python3 scripts/check-doc-links.py` | PASS |
+| `git diff --check` | PASS |
+| `python3 web/tools/preview.py --port 8765` | Uncached loopback test/site preview |
+| `python3 web/tools/preview.py --root --port 8766` | Origin-root source and actual nested custom 404 |
+| `node web/.artifacts/web05-check.mjs` | Chrome 154.0.8037.92 Guest; final browser evidence below |
+
+The execution sandbox refused preview sockets and crashed Chrome; each necessary rerun received
+explicit tool escalation approval. Chromium's own sandbox remained enabled throughout. Every
+browser launch used Guest and a fresh repository-local profile; no personal browser was attached.
+Long temporary paths exceeded Chrome's Unix socket limit. Short fresh run directories resolved this.
+Guest `--dump-dom` produced no report and `/json/new` returned HTTP 500; the local verification
+script instead connects to the debugging port recorded by the browser it just started and uses
+that instance's existing blank Guest tab. All run profiles/reports remain under `web/.artifacts/`.
+
+Intermediate runs are preserved: 43 PASS / 4 FAIL from inactive headless focus pseudo-classes;
+46 PASS / 1 FAIL from responsive image selection racing text enlargement. The runner now verifies
+DOM focusability, and waits two rendering frames after changing text size before decoding images.
+The origin-root inspection separately checks actual focused skip-link visibility with headless
+focus emulation enabled. A later runner passed 47 checks, but its extra root focus inspection
+failed before focus emulation; it is not counted as a passing full inspection.
+
+**Outstanding at implementation handoff (subsequently resolved by owner review below):** Mobile and Desktop Lighthouse (CLI is not installed;
+use Chrome DevTools Navigation and save both reports/version under `web/.artifacts/`), real-mobile
+portrait/landscape, screen-reader smoke, manual Tab/Shift+Tab/Enter/Space/Escape and skip-target
+behavior, text-only enlargement/400% desktop zoom, reduced-motion/forced-colors inspection, Firefox
+rerun for this increment, and manual DevTools console/network inspection. The earlier owner Firefox
+WEB-04 report does not verify changed WEB-05 pages. The automated 200% root-font check is not
+claimed as a real browser text-only setting or manual zoom result. Material Lighthouse findings
+must be resolved and remaining manual acceptance established before approval.
+
+Owner review: run the default preview for `/site/` and `/tests/browser.html`, and the `--root`
+preview for `/unknown/nested/page`. Review local artwork and the quality/accessibility evidence.
+[Web instructions](../AGENTS.md) require “Stop for owner inspection after each milestone.” WEB-05
+was Awaiting approval at this implementation handoff; the subsequent owner review is recorded below.
+
+
+Final Guest browser result: **47 PASS / 0 FAIL / 0 TIMEOUT / 0 SKIP**, Chrome
+154.0.8037.92 on Linux, `2026-10-13T06:37:09.145Z`, at
+`http://127.0.0.1:8765/tests/browser.html`. Evidence: `web/.artifacts/qYyzSLa/browser.json`.
+The same isolated browser then inspected all four indexable origin-root routes plus
+`/unknown/nested/page`: CSS loaded, focused skip links unclipped, no horizontal overflow, no
+network loading failures, and all observed page requests stayed on `http://127.0.0.1:8766/`.
+Route JSON and `network.json` are in the same run directory. The custom HTTP 404 status and exact
+body are verified by the offline handler test; root browser inspection establishes rendering and
+asset resolution. Social image was also visually inspected locally; no clipping of the card text.
+Both agent-owned preview servers were stopped after verification. Final documentation links and
+whitespace validation pass. Lighthouse and manual limitations were pending at this run.
+
+## WEB-05 owner review and approval
+
+On 2026-10-13 the owner reported: “All is good. The lighthouse report is updated in the
+web/.artifacts directory.” This accepts WEB-05 after the supplied manual verification checklist:
+keyboard/skip-link navigation, narrow layouts and text/desktop zoom, Firefox and a real phone in
+both orientations, reduced motion and screen-reader smoke, and the nested custom 404. These are
+**user-run** results, not agent-run checks. Exact manual browser versions, phone model,
+screen-reader name and individual viewport measurements were not supplied. Earlier agent-run
+console/network and fallback evidence remains recorded above; current local preview inspection
+is accepted, while the cause of the earlier HTTP/file discrepancy remains unknown.
+
+The agent parsed the updated reports locally without loading the entire JSON into conversation.
+Both test `http://127.0.0.1:8766/` with Lighthouse **13.4.1**, Chrome **154.0.0.0** host user-agent
+on Linux. Neither has a runtime error, run warning or observed extension resource; the earlier
+extension-related unused-JavaScript finding has disappeared. Lighthouse Mobile is simulation,
+separate from the owner's real-phone inspection.
+
+| User-run report | UTC fetch time | Performance / Accessibility / Best practices / SEO | FCP | LCP | TBT | CLS |
+|---|---|---|---|---|---|---|
+| `web/.artifacts/lighthouse-mobile.json` | 2026-10-13T07:31:32.031Z | 100 / 100 / 100 / 100 | 1.0 s | 1.4 s | 0 ms | 0 |
+| `web/.artifacts/lighthouse-desktop.json` | 2026-10-13T07:32:22.783Z | 100 / 100 / 100 / 100 | 0.3 s | 0.4 s | 0 ms | 0 |
+
+Report SHA-256, to identify the reviewed local files (artifacts remain ignored):
+
+- Mobile: `23858894eac5f2fc926751cfb7fb0f9ef71668fba26958225c87c3959b1f66ea`.
+- Desktop: `762116d697c89eb8f51058f193dc896de7e67bb52df570e94a7fbb1ba08e4ebc`.
+
+Remaining diagnostics were reviewed as nonblocking for this local quality gate:
+
+- Back/forward cache exclusions name the preview's intentional `Cache-Control: no-store`;
+  compression is absent from this standard-library preview. These are local-server observations;
+  assess actual hosting headers again at launch, rather than claiming production verification.
+- Image delivery estimates 80 KiB savings on Mobile and 188 KiB on Desktop. These concern existing
+  responsive hero selection and below-fold lazy screenshots. With 1.4 s Mobile LCP, zero blocking
+  time and zero layout shift, these are optimization opportunities rather than observed loading
+  failures. Retain the approved original screenshot bytes and responsive hero in this milestone.
+- The short same-origin CSS/module dependency chain and stylesheet render-blocking diagnostic
+  show no material load regression in these reports. No third-party preconnect is needed.
+
+WEB-05 is owner-approved and Complete in the [roadmap](roadmap.md). WEB-06 is next but has not been
+started. Changes remain uncommitted; nothing was exported, published or pushed.
+
+Agent-run approval handoff validation, 2026-10-13: `python3 -m unittest discover -s web/tests
+-p 'test_*.py'` PASS (39 tests); `python3 web/tests/audit.py` PASS (0 findings);
+`python3 scripts/check-doc-links.py` PASS (91 Markdown files); `git diff --check` PASS.
+Browser automation was not repeated for these documentation-only approval updates.

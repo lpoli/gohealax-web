@@ -298,6 +298,40 @@ for (const route of contentRoutes) {
   });
 }
 
+// WEB-05 quality: real assets decode; enlarged text reflows on all content routes.
+for (const route of contentRoutes) {
+  test(`${route}: skip link, image decoding and 200% text reflow`, async signal => {
+    await withFrame(`../site/${route}`, 320, signal, async (doc, win) => {
+      const skip = doc.querySelector('.skip-link');
+      assert(skip && doc.querySelector(skip.getAttribute('href')), 'skip target missing');
+      skip.focus();
+      assert(doc.activeElement === skip, 'skip link cannot receive focus');
+      doc.documentElement.style.fontSize = '200%';
+      await new Promise(resolve => win.requestAnimationFrame(() => win.requestAnimationFrame(resolve)));
+      await Promise.all([...doc.images].map(async image => {
+        image.loading = 'eager'; await image.decode();
+        assert(image.naturalWidth > 0, `image did not decode: ${image.getAttribute('src')} (${image.currentSrc})`);
+      }));
+      assert(doc.documentElement.scrollWidth <= win.innerWidth + 1, 'overflow at 200% text');
+    });
+  });
+}
+test('WEB-05 sitemap, social image and 404 HTML contract', async signal => {
+  const doc = await fetchPage('../site/404.html', signal);
+  assert(doc.querySelector('meta[name="robots"]').content === 'noindex', '404 indexable');
+  assert(!doc.querySelector('link[rel="canonical"]'), '404 canonical');
+  for (const node of doc.querySelectorAll('[href], [src]')) {
+    const value = node.getAttribute('href') || node.getAttribute('src');
+    assert(value.startsWith('/') || value.startsWith('#') || value.startsWith('mailto:'), 'nested 404 relative resource');
+  }
+  const response = await fetch('../site/sitemap.xml', { signal, cache: 'no-store' });
+  assert(response.ok, 'sitemap missing');
+  const xml = new DOMParser().parseFromString(await response.text(), 'application/xml');
+  assert(xml.querySelectorAll('loc').length === 4 && !xml.documentElement.textContent.includes('404.html'), 'sitemap routes');
+  const image = new Image(); image.src = '../site/assets/social.png'; await image.decode();
+  assert(image.naturalWidth === 1200 && image.naturalHeight === 630, 'social image dimensions');
+});
+
 const results = [];
 for (const { name, action } of cases) {
   document.getElementById('summary').textContent = `Running: ${name}`;
@@ -315,7 +349,7 @@ const status = counts.FAIL || counts.TIMEOUT ? 'FAIL' : counts.SKIP ? 'BASELINE_
 window.browserReport = {
   status, counts, results, userAgent: navigator.userAgent, url: location.href,
   timestamp: new Date().toISOString(),
-  scope: 'WEB-04 production interactions in controlled fixtures; four real pages with scripts disabled; manual browser/assistive/network checks remain separate',
+  scope: 'WEB-05 quality and WEB-04 production interactions; four real pages with scripts disabled and enlarged text; nested 404 and manual accessibility/network checks remain separate',
 };
 document.getElementById('report').textContent = JSON.stringify(window.browserReport, null, 2);
 document.getElementById('summary').textContent = `${status}: ${counts.PASS} pass, ${counts.FAIL} fail, ` +

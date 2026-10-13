@@ -14,6 +14,10 @@ class InteractionTests(unittest.TestCase):
             doc = read_document(page)
             nav = doc.find('nav')[0]
             self.assertNotIn('hidden', nav.attrs)
+            if page.name == '404.html':
+                self.assertFalse(doc.find('button') + doc.find('script'))
+                self.assertTrue(all(n.attrs['href'].startswith('/') for n in nav.find('a')))
+                continue
             self.assertEqual('site-navigation', nav.attrs['id'])
             button = doc.find('button')[0]
             self.assertIn('hidden', button.attrs)

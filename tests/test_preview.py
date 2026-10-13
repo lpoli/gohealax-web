@@ -54,3 +54,19 @@ class PreviewTests(unittest.TestCase):
         self.assertIn(b'HTTP/1.0 200', request('/site.css', root))
         for path in ('/tests/browser.html', '/docs/handoff.md', '/../PROJECT.md'):
             self.assertIn(b'HTTP/1.0 404', request(path, root))
+
+
+class Nested404Tests(unittest.TestCase):
+    def test_unknown_nested_url_returns_actual_404_document_and_status(self):
+        bind, root = preview.preview_settings(root=True)
+        self.assertEqual('127.0.0.1', bind)
+        QuietHandler.fallback_404 = True
+        try:
+            response = request('/unknown/nested/page', root)
+            self.assertTrue(response.startswith(b'HTTP/1.0 404'))
+            self.assertEqual((root / '404.html').read_bytes(), response.split(b'\r\n\r\n', 1)[1])
+            self.assertIn(b'Cache-Control: no-store', response)
+            for path in ('/site.css', '/About.html', '/assets/favicon.svg'):
+                self.assertTrue(request(path, root).startswith(b'HTTP/1.0 200'))
+        finally:
+            QuietHandler.fallback_404 = False

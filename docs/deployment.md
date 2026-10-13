@@ -30,7 +30,8 @@ python3 -m http.server 8001 --bind 127.0.0.1 --directory web/.release/site
 
 Inspect every exported page at origin root, including `/404.html`. Also test a server returning the
 404 document for an unknown nested path; a generic Python 404 response alone does not test our 404.
-WEB-06 supplies the exact nested-404 preview command with its test fixture/server. Approve the exact
+WEB-05 supplies `python3 web/tools/preview.py --root --port 8766` for source inspection.
+WEB-06 must extend this preview to the export and record the exact command. Approve the exact
 manifest hash and monorepo revision before publishing. Export approval is not permission to change DNS.
 
 ## Separate public repository
