@@ -45,10 +45,11 @@ has a visible static loading message and a watchdog for bootstrap failure.
 
 WEB-02 real-page checks include landing/About/Privacy navigation/contact, rendered width at
 320, 375, 768, 1024 and 1440px, stylesheet application and HTTP loading, with scripts disabled.
-The homepage redirect is now forbidden in both the offline gate and browser runner. WEB-04 must
+The homepage redirect is now forbidden in both the offline gate and browser runner. WEB-04 checks
 import the production `site.js`/`media.js` functions into fixtures, with controlled
-player adapters. Cover menu state, Escape/focus, link activation, duplicate initialization, resize,
-invalid/disabled/media activation and playback failures. Add modules and their tests together; do
+player adapters. The runner now has no deferred interaction groups. It checks all four pages at the
+scripts-disabled widths above and applies the production enhancement to real mobile markup. Cover menu state, Escape/focus, link activation, duplicate initialization, resize,
+invalid/disabled/media activation and playback failures. Maintain modules and their tests together; do
 not create a test-only imitation of the production controller. The baseline runner self-check is
 infrastructure coverage, not proof of future product behavior.
 
@@ -73,3 +74,16 @@ Use DevTools → Lighthouse → Navigation → Mobile, then Desktop; save report
 `web/.artifacts/`. Browser screenshots, temporary profiles and reports stay there as well. Do not
 run native builds/device tests for Web-only changes. Any owner-reported evidence is explicitly
 labelled **user-run**, and unrun work is **not run**, never inferred from source inspection.
+
+## Fresh browser fixtures
+
+Real-page fixtures fetch their HTML with `cache: no-store`, then use a script-disabled `srcdoc`
+frame with the original page URL as its base. Stylesheets retain their real HTTP URLs with a fresh
+`_webcheck` query value per fixture. This prevents an ordinary browser profile from mixing fresh
+HTML assertions with older cached frame HTML/CSS. Relative images/links still resolve from the real
+page route. HTTP errors remain failures. The browser regression verifies repeated stylesheet URL
+freshness, current HTML, original relative asset resolution and missing-page failure.
+
+After changing the runner itself, hard-refresh `/tests/browser.html` once (Ctrl+Shift+R on Linux
+Chrome) to load the updated test modules. Current automated coverage is 42 cases; user rerun evidence
+is separate from the agent's result in the handoff.

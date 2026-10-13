@@ -10,7 +10,8 @@
 <body>
   <header class="shell">
     <a class="brand" href="index.html#home" aria-label="GoHealaX home">GoHealaX</a>
-    <nav aria-label="Site navigation">
+    <button type="button" class="button navigation-toggle" data-navigation-toggle hidden aria-expanded="false" aria-controls="site-navigation">Menu</button>
+    <nav id="site-navigation" aria-label="Site navigation">
       <a href="index.html#home">Home</a>
       <a href="index.html#features">Features</a>
       <a href="index.html#demo">Demo</a>
@@ -19,12 +20,13 @@
       <a href="index.html#team">Team</a>
       <a href="index.html#contact">Contact</a>
       <a href="privacy-policy.html" aria-current="page">Privacy</a>
+      <a href="medical-disclaimer.html">Medical disclaimer</a>
       <a class="button primary" href="index.html#download">Get the app</a>
     </nav>
   </header>
 
   <main class="shell">
-    <p class="eyebrow">Last updated: October 12, 2026</p>
+    <p class="eyebrow">Last updated: October 13, 2026</p>
     <h1>Privacy policy</h1>
     <p class="lead">GoHealaX is designed to work locally on your device.</p>
 
@@ -35,7 +37,7 @@
     <p>GoHealaX has no user accounts, analytics, or advertising SDKs. It does not automatically send exercise data to the developer or third parties. If you export or restore a backup, Android’s document picker accesses your chosen local or cloud storage provider, which handles that file under its own policies. All current features are free and work without purchases or a store connection.</p>
 
     <h2>Health disclaimer</h2>
-    <p>GoHealaX is not a medical device and does not diagnose, treat, cure, or prevent any condition. Exercise timings are configurable tools, not medical advice or universally optimal treatment. Consult a qualified healthcare professional for advice about your exercise programme.</p>
+    <p>GoHealaX does not diagnose, treat, cure, or prevent any condition. Configurable timings are tools, not universally optimal treatment. Consult a qualified healthcare professional about your exercise programme.</p>
 
     <h2>Notifications</h2>
     <p>When you start an exercise timer, GoHealaX uses a foreground notification so the timer can remain visible and controllable in the background. The notification can show the current phase, remaining time, and repetition, subject to your Android notification and lock-screen settings.</p>
@@ -43,11 +45,16 @@
     <h2>Retention and deletion</h2>
     <p>Your local data remains on your device until you delete it in the app, clear GoHealaX storage, or uninstall the app in Android settings. GoHealaX disables automatic Android cloud backup and device-to-device transfer. Exported JSON backups contain readable, unencrypted personal exercise data and app preferences. Files may remain with the selected provider and survive uninstall or clearing app storage; manage and delete those copies through that provider. Restore replaces current exercise data and preferences only after confirmation. Backups exclude permissions, active timers, loaded setup and unsaved drafts.</p>
 
-    <h2>Website and contact</h2>
-    <p>This informational site has no developer-added forms, analytics, advertising, or tracking scripts. If you email us, the information in your message is handled by your email provider and may be used only to respond to your request. The site is hosted through GitHub Pages; GitHub’s handling of information when you use its services is described in its <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">Privacy Statement</a>.</p>
+    <h2>Website hosting</h2>
+    <p>This informational website is separate from the Android app. It has no developer-added forms, analytics, advertising or tracking scripts, no developer-added cookies or browser storage, and no service worker. The actual hosting operator has not yet been verified. A hosting provider may receive technical request information, such as IP address and browser details, when serving pages; its identity and applicable policy will be recorded when hosting is verified.</p>
+    <h2>Optional demo media</h2>
+    <p>The current demo is disabled and sends no media requests. If reviewed media is enabled later, a player is created only when you explicitly choose Play. A local video is served by the website host. A YouTube player connects to youtube-nocookie.com and other YouTube services after activation; privacy-enhanced mode does not eliminate data exchange with Google. The description remains readable if playback is blocked. Media and privacy disclosures will be reviewed before a video is enabled.</p>
+    <h2>Contact by email</h2>
+    <p>Email links open your email provider. Information in your message is handled by that provider and may be used only to respond to your request.</p>
     <p>For privacy questions, email <a href="mailto:b.lp.self@gmail.com">b.lp.self@gmail.com</a>.</p>
   </main>
 
   <footer class="shell">© 2026 GoHealaX · <a href="About.html">About</a></footer>
+  <script type="module" src="site.js"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 Updated: 2026-10-13. Milestone status and approval authority: [roadmap](roadmap.md).
 WEB-02 startup: clean `web-development` branch at `2a360fa`. WEB-01 history below retains its
 original evidence. WEB-02 was committed as `6c08b13`. WEB-03 began from that clean revision on
-`web-development`; it was committed as `5b1de39`. Approval documentation is uncommitted.
+`web-development`; it was committed as `5b1de39`. Approval documentation was committed as `559a0e0`.
 Nothing pushed by the agent.
 
 ## Current increment
@@ -12,7 +12,7 @@ WEB-01 established the documentation and verification baseline and was explicitl
 owner on 2026-10-12. All seven milestone descriptions were created before checker/runner
 implementation. WEB-02 replaces the index redirect with the responsive landing composition. Owner layout/imagery
 approval was granted explicitly on 2026-10-12. WEB-03 content and screenshot presentation were explicitly approved on 2026-10-13.
-WEB-04 is eligible to start; it has not started. See the evidence below.
+WEB-04 implementation evidence and explicit owner approval are recorded below.
 
 ## WEB-03 startup and verification
 
@@ -234,7 +234,7 @@ and per-check manual results were not provided; later manual/release gates remai
 
 The approval is recorded in the roadmap. WEB-02 was subsequently implemented and committed as `6c08b13`, then explicitly approved on
 2026-10-12 as recorded above. WEB-03 was committed as `5b1de39` and explicitly approved on 2026-10-13.
-WEB-04 is the next eligible increment. The seven-milestone gate remains in force.
+WEB-04 was subsequently implemented as recorded below. The seven-milestone gate remains in force.
 
 ## Blockers and owner inputs
 
@@ -248,3 +248,118 @@ WEB-04 is the next eligible increment. The seven-milestone gate remains in force
 
 No native implementation, requirement IDs, iOS pricing decision or app contracts changed. The shared
 requirements clarify the informational site's applicability and browser text sizing only.
+
+## WEB-04 implementation and verification
+
+Startup: clean `web-development` at `559a0e0` (WEB-03 approval), 2026-10-13. Owner request:
+“Start milestone WEB-04.” Implementation/handoff changes are uncommitted. Nothing pushed.
+
+Implemented:
+
+- `site/site.js`: idempotent progressive mobile disclosure on all four pages, native links and
+  button, ARIA state/control association, Escape with focus return, unprevented link activation,
+  and focus movement before resize hides a control. Native navigation stays visible with failed
+  or disabled JavaScript. Reviewed the linked WAI guidance again; no example code copied.
+- `site/media.js`: attribute-driven reviewed configuration validation, same-origin local-file
+  existence probes, explicit activation, native video/English caption and privacy-enhanced YouTube
+  adapters. Error/timeout cleanup, explicit Retry, direct-media/watch links, retained description
+  and stale-callback protection. An iframe load reports loading only, not verified playback.
+- Disabled demo retains a local poster reused from the approved WEB-03 screenshot register, with
+  synthetic-data caption and readable description. No video is supplied/reviewed or enabled; no
+  media probe or player request occurs for this disabled configuration.
+- New exact-case `medical-disclaimer.html`; exact canonical PROD-01 paragraph on About, Privacy
+  and Medical Disclaimer. Android privacy disclosures retained and checked against the Android
+  policy. Separate website hosting, optional-media and email disclosures replace the unverified
+  GitHub Pages assertion. Actual hosting/operator verification remains a WEB-07 input.
+- Browser tests now exercise actual production modules and real mobile page markup. Deferred
+  interaction groups are removed. Controlled adapters isolate playback; the native YouTube DOM
+  check uses a detached iframe and makes no YouTube request. Native caption/video DOM and error
+  handling are checked with playback suppressed.
+
+Agent-run, Linux, 2026-10-13:
+
+| Check | Result |
+|---|---|
+| `python3 -m unittest discover -s web/tests -p 'test_*.py'` | PASS: 33 tests. Four WEB-04 tests first failed against the existing pages; the final suite also checks local initial HTML resources |
+| `python3 web/tests/audit.py` | Exit 1: six WEB-05 findings only: About/Privacy/Medical canonical URLs; 404, sitemap and robots |
+| `python3 scripts/check-doc-links.py` | PASS: 91 Markdown files |
+| `git diff --check` | PASS |
+| Chrome 154.0.8037.92 headless `/tests/browser.html` | PASS: 41 PASS / 0 FAIL / 0 TIMEOUT / 0 SKIP |
+
+Final browser report timestamp: `2026-10-13T02:59:10.900Z`.
+
+Browser coverage: scripts-disabled styling/width checks at 320/375/768/1024/1440 on all four pages,
+HTML navigation/link/contact checks, real mobile enhancement on all four pages, idempotent controllers,
+Escape/focus/resize, invalid/review/caption/source checks, duplicate activation, blocked/error/timeout
+fallbacks, stale callbacks, explicit retry, native player attributes and caption errors. Adapter
+checks do not establish live playback, assistive usability or a clean production network trace.
+
+Preview command: `python3 -m http.server 8000 --bind 127.0.0.1 --directory web`.
+Exact browser command:
+
+```sh
+env TMPDIR=/home/lpoli/workspace/gohealax/web/.artifacts/tmp XDG_CONFIG_HOME=/home/lpoli/workspace/gohealax/web/.artifacts/config XDG_CACHE_HOME=/home/lpoli/workspace/gohealax/web/.artifacts/cache google-chrome --headless --disable-gpu --disable-dev-shm-usage --disable-breakpad --disable-crash-reporter --disable-background-networking --disable-component-update --no-first-run --no-default-browser-check --user-data-dir=/home/lpoli/workspace/gohealax/web/.artifacts/chrome-web04 --disk-cache-dir=/home/lpoli/workspace/gohealax/web/.artifacts/cache-web04 --crash-dumps-dir=/home/lpoli/workspace/gohealax/web/.artifacts/crashes --virtual-time-budget=30000 --dump-dom http://127.0.0.1:8000/tests/browser.html > web/.artifacts/browser-chrome-web04.html 2> web/.artifacts/browser-chrome-web04.log
+```
+
+Chrome exited 133 under the sandbox; explicitly tool-approved execution outside it succeeded.
+Profile/cache/temp/log/HTML and extracted JSON report remain inside ignored `web/.artifacts/`.
+The runner's incidental favicon request is still a 404 (WEB-05). Preview server stopped at handoff.
+No native build/device tests or shared requirement edits; iOS verifier was not required or run.
+All writes stayed inside the working directory. Owner reference files are untouched.
+
+**Owner inspection required by `web/AGENTS.md`:** “Stop for owner inspection after each milestone.”
+Review navigation, keyboard/failure behavior and the legal pages before explicitly approving WEB-04;
+WEB-05 remains gated. Firefox, real mobile portrait/landscape, manual Tab/Shift+Tab/Enter/Space/Escape,
+screen-reader smoke, zoom/text enlargement, disabled/failed module loading in a real tab, real
+blocked/missing media/captions and a DevTools Network/console review are **not run**. Scripts-disabled
+frames establish the HTML fallback; controlled fixtures establish interaction behavior, neither
+substitutes for those manual checks. Missing reviewed media is the permitted disabled-demo default,
+not a blocker for local site implementation. No hosting, store, DNS or publication claim is inferred.
+
+## WEB-04 owner report and runner cache correction
+
+User-run Chrome 154 on Linux, `http://127.0.0.1:8000/tests/browser.html`, timestamp
+`2026-10-13T03:11:05.814Z`: **37 PASS / 4 FAIL / 0 TIMEOUT / 0 SKIP**. Three failures showed homepage
+images at intrinsic width at 320/375/768; the fourth found no About disclosure button. These results
+are preserved as failed owner evidence, not replaced by the earlier agent pass.
+
+Inspection identified a runner cache weakness: its separate assertions fetched pages with no-store,
+but its real-page iframes loaded ordinary cached URLs, including CSS. The report is consistent with
+older cached landing CSS and About HTML; the owner's cache contents were not inspected directly.
+
+Changed only test infrastructure and documentation: real-frame HTML now comes from the no-store
+fetch itself, with an original-route base and fresh same-origin stylesheet URLs. Page scripts remain
+disabled. A regression checks repeated CSS URL freshness, current HTML, correct relative images and
+HTTP 404 failure. Website code is unchanged by this correction.
+
+Agent-run, Linux/Chrome 154.0.8037.92, `2026-10-13T03:20:47.363Z`: **42 PASS / 0 FAIL / 0 TIMEOUT /
+0 SKIP**. Reused the isolated WEB-04 profile/cache. Command matches the WEB-04 invocation above,
+with preview port `8001` and report suffix `web04-cachefix`. The separate preview used
+`python3 -m http.server 8001 --bind 127.0.0.1 --directory web`; the sandbox denied its socket, then
+explicitly tool-approved execution succeeded. That agent-owned server was stopped without touching
+the owner's port-8000 preview. Reports remain in `web/.artifacts/`. Offline suite: 33 PASS;
+documentation links and `git diff --check`: PASS. No source/native change or new publication action.
+
+Owner action: hard-refresh the browser runner once (Ctrl+Shift+R) to load its updated modules and
+rerun; expect 42 checks. The subsequent owner rerun and approval below resolve this request. Other unrun manual checks
+remain recorded separately.
+
+## WEB-04 owner approval
+
+Owner report and approval, 2026-10-13 (user-run): “Yes all the tests passes. The firefox browser also
+displays the pages properly even with variable sizes. I approve these changes.”
+
+This explicitly approves the WEB-04 implementation, including the runner cache correction. The owner
+confirms all automated browser checks pass after the correction (the current runner has 42 cases;
+no replacement JSON or separate counts were supplied). The owner also reports that Firefox renders
+the pages correctly at variable sizes. Firefox version, exact widths and per-page results were not
+supplied, so this is recorded as a general user-run layout check.
+
+WEB-04 is Complete in the roadmap; WEB-05 is the next eligible increment and has not started.
+Approval does not establish individual keyboard, screen-reader, real mobile, zoom/orientation,
+DevTools Network/console or actual enabled-media checks. Their remaining limitations carry forward
+into the later accessibility/release gates. The demo stays disabled; nothing was published or pushed.
+Implementation and approval documentation remain uncommitted.
+
+Approval-update validation: `python3 scripts/check-doc-links.py` and `git diff --check` passed.
+Website/test implementation is unchanged in this approval update; browser/native tests were not rerun.

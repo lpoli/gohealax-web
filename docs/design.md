@@ -40,15 +40,14 @@ description and absolute canonical. Add sitemap, robots rules and social metadat
 
 ## Progressive navigation
 
-HTML starts with visible native navigation links. WEB-02 must work without JavaScript. In WEB-04,
-`site.js` exposes an idempotent initialization function; it reveals a real disclosure button and
+HTML starts with visible native navigation links. WEB-02 must work without JavaScript. `site.js` exposes an idempotent initialization function; it reveals a real disclosure button and
 collapses mobile navigation only after setup succeeds. Use `aria-expanded` and `aria-controls`,
 native Tab order, no application-menu roles, no focus trap. Escape closes and focuses the button;
 link activation closes without cancelling navigation. On resize, never hide the focused element
 without moving focus to an appropriate visible control. Desktop navigation remains visible.
 
 Basis: [WAI disclosure navigation guidance](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/),
-reviewed 2026-10-12. Test our implementation and assistive-technology behavior; do not copy the example
+reviewed 2026-10-12 and rechecked 2026-10-13. Test our implementation and assistive-technology behavior; do not copy the example
 as production code.
 
 ## Imagery

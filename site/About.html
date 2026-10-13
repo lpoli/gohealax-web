@@ -10,7 +10,8 @@
 <body>
   <header class="shell">
     <a class="brand" href="index.html#home" aria-label="GoHealaX home">GoHealaX</a>
-    <nav aria-label="Site navigation">
+    <button type="button" class="button navigation-toggle" data-navigation-toggle hidden aria-expanded="false" aria-controls="site-navigation">Menu</button>
+    <nav id="site-navigation" aria-label="Site navigation">
       <a href="index.html#home">Home</a>
       <a href="index.html#features">Features</a>
       <a href="index.html#demo">Demo</a>
@@ -19,6 +20,7 @@
       <a href="index.html#team">Team</a>
       <a href="index.html#contact">Contact</a>
       <a href="privacy-policy.html">Privacy</a>
+      <a href="medical-disclaimer.html">Medical disclaimer</a>
       <a class="button primary" href="index.html#download">Get the app</a>
     </nav>
   </header>
@@ -49,6 +51,9 @@
     <p>Android download link coming soon. iOS: Coming Soon.</p>
     <p><a href="index.html#download">View app availability</a></p>
 
+    <h2>Health disclaimer</h2>
+    <p>GoHealaX does not diagnose, treat, cure, or prevent any condition. Configurable timings are tools, not universally optimal treatment. Consult a qualified healthcare professional about your exercise programme.</p>
+
     <h2>People and contact</h2>
     <!-- Contributor edits: replace this placeholder only with owner-supplied, reviewed names and details. -->
     <p>Contributor introductions are coming soon.</p>
@@ -59,5 +64,6 @@
 
   <!-- Social edits: add links only after real destinations are supplied and verified. -->
   <footer class="shell">© 2026 GoHealaX · <a href="privacy-policy.html">Privacy policy</a></footer>
+  <script type="module" src="site.js"></script>
 </body>
 </html>

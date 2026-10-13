@@ -17,7 +17,7 @@ class LandingTests(unittest.TestCase):
                          [n.attrs.get('id') for n in self.doc.find('section')])
         self.assertFalse(any(n.attrs.get('http-equiv', '').lower() == 'refresh'
                              for n in self.doc.find('meta')))
-        self.assertFalse(self.doc.find('script'))
+        self.assertTrue(all(n.attrs.get('type') == 'module' and n.attrs.get('src') in {'site.js', 'media.js'} for n in self.doc.find('script')))
         self.assertTrue(any(n.attrs.get('name') == 'viewport' for n in self.doc.find('meta')))
 
     def test_plain_navigation_and_honest_availability(self):

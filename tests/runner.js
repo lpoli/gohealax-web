@@ -1,4 +1,4 @@
-// Test infrastructure only. Production interactions will be imported by browser.js in WEB-04.
+// Test infrastructure. browser.js imports the actual production interaction modules.
 export class Skip extends Error {}
 export class Timeout extends Error {}
 
@@ -39,18 +39,36 @@ export async function withFrame(source, width, signal, check, { srcdoc = false }
   const frame = document.createElement('iframe');
   frame.title = 'Isolated browser test fixture';
   frame.width = String(width);
-  // Existing page baseline does not need scripts. WEB-04 module fixtures will explicitly import
-  // production code, rather than implicitly running arbitrary page scripts in this frame.
+  // Page HTML runs without scripts. Fixture checks explicitly call imported production functions
+  // against this document; page scripts never execute implicitly.
   frame.setAttribute('sandbox', 'allow-same-origin');
   const dispose = () => frame.remove();
   signal.addEventListener('abort', dispose, { once: true });
   try {
+    if (!srcdoc) {
+      // Fetch the exact HTML used by the frame, bypassing previously cached page revisions.
+      const url = new URL(source, location.href);
+      const doc = await fetchPage(url, signal);
+      assert(!doc.querySelector('base'), 'site pages must use document-relative URLs');
+      const base = doc.createElement('base');
+      base.href = url.href;
+      doc.head.prepend(base);
+      // A no-store HTML fetch alone cannot invalidate the browser's stylesheet cache.
+      // Give each fixture an unused CSS URL while still loading the actual HTTP stylesheet.
+      for (const link of doc.querySelectorAll('link[rel~="stylesheet"][href]')) {
+        const stylesheet = new URL(link.getAttribute('href'), url);
+        assert(stylesheet.origin === url.origin, 'fixture stylesheet must be same-origin');
+        stylesheet.searchParams.set('_webcheck', crypto.randomUUID());
+        link.href = stylesheet.href;
+      }
+      source = '<!doctype html>' + doc.documentElement.outerHTML;
+    }
+    assert(!signal.aborted, 'fixture aborted before load');
     await new Promise((resolve, reject) => {
       frame.addEventListener('load', resolve, { once: true });
       frame.addEventListener('error', () => reject(new Error('frame load failed')), { once: true });
       signal.addEventListener('abort', () => reject(new Error('frame load aborted')), { once: true });
-      if (srcdoc) frame.srcdoc = source;
-      else frame.src = source;
+      frame.srcdoc = source;
       document.getElementById('fixtures').append(frame);
     });
     assert(!signal.aborted, 'fixture aborted');

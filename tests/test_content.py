@@ -20,7 +20,7 @@ class ContentTests(unittest.TestCase):
                                'History', 'Statistics', 'planned and completed sets',
                                'do not measure recovery', 'create your own exercises'):
                     self.assertIn(phrase, text)
-                self.assertFalse(doc.find('script'))
+                # Essential copy above is parsed directly from HTML, independent of scripts.
 
     def test_availability_and_contact_are_honest(self):
         for route in ('index.html', 'About.html'):

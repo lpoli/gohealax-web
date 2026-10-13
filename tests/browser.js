@@ -1,8 +1,11 @@
 import { assert, fetchPage, runCase, Skip, withFrame } from './runner.js';
 
+import { initNavigation } from '../site/site.js';
+import { initMedia, createPlayer } from '../site/media.js';
+
 const cases = [];
 const test = (name, action) => cases.push({ name, action });
-const contentRoutes = ['index.html', 'About.html', 'privacy-policy.html'];
+const contentRoutes = ['index.html', 'About.html', 'privacy-policy.html', 'medical-disclaimer.html'];
 
 test('Runner distinguishes assertions, skips and timeouts (infrastructure only)', async () => {
   const pass = await runCase('success', () => {});
@@ -18,6 +21,26 @@ test('Isolated fixture loads and is disposed (infrastructure only)', async signa
     320, signal, doc => assert(doc.querySelector('h1')?.textContent === 'Fixture', 'fixture unavailable'),
     { srcdoc: true });
   assert(!document.querySelector('#fixtures iframe'), 'fixture leaked');
+});
+
+test('Real-page frames refresh HTML/CSS and preserve relative asset resolution', async signal => {
+  let previousStyle;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await withFrame('../site/index.html', 375, signal, doc => {
+      assert(doc.baseURI === new URL('../site/index.html', location.href).href, 'incorrect page base');
+      assert(doc.querySelector('[data-navigation-toggle]'), 'current HTML missing');
+      const style = new URL(doc.querySelector('link[rel="stylesheet"]').href);
+      assert(style.pathname.endsWith('/site/site.css') && style.searchParams.has('_webcheck'),
+        'stylesheet can reuse a stale cached revision');
+      assert(style.href !== previousStyle, 'successive fixtures reused stylesheet cache key');
+      previousStyle = style.href;
+      assert(doc.querySelector('.hero-photo img').src.endsWith('/site/assets/hero-800.webp'),
+        'relative image resolution changed');
+    });
+  }
+  const missing = await runCase('missing real page', childSignal =>
+    withFrame('../site/does-not-exist.html', 320, childSignal, () => {}));
+  assert(missing.status === 'FAIL' && missing.detail.includes('HTTP 404'), 'HTTP errors became passing fixtures');
 });
 
 test('Landing homepage is retrievable and its HTML link target resolves', async signal => {
@@ -96,13 +119,183 @@ for (const route of contentRoutes) {
   }
 }
 
-for (const deferred of [
-  'Production navigation state, link activation and repeated initialization',
-  'Production Escape/focus and resize behavior',
-  'Production media disabled, invalid and activated states',
-  'Production playback error and timeout fallbacks with controlled adapters',
-]) {
-  test(deferred, () => { throw new Skip('WEB-04: production modules not implemented until WEB-04'); });
+// Actual production controllers run against isolated, script-disabled documents.
+const navigationFixture = `<!doctype html><html><body><header>
+<button data-navigation-toggle hidden aria-controls="fixture-nav" aria-expanded="false">Menu</button>
+<nav id="fixture-nav"><a href="#target">Target</a></nav></header><main id="target">Content</main></body></html>`;
+function fakeMediaQuery() {
+  const listeners = [];
+  return { matches: false, addEventListener: (_, callback) => listeners.push(callback),
+    resize(value) { this.matches = value; listeners.forEach(callback => callback()); },
+    get count() { return listeners.length; } };
+}
+test('Production navigation state, native link activation and duplicate initialization', async signal => {
+  await withFrame(navigationFixture, 320, signal, (doc, win) => {
+    const query = fakeMediaQuery();
+    const first = initNavigation(doc, { matchMedia: () => query });
+    assert(initNavigation(doc, { matchMedia: () => query }) === first, 'duplicate controller');
+    assert(query.count === 1, 'duplicate resize listener');
+    const button = doc.querySelector('button'), nav = doc.querySelector('nav');
+    assert(!button.hidden && nav.hidden && button.getAttribute('aria-expanded') === 'false', 'initial state');
+    button.click();
+    assert(!nav.hidden && button.getAttribute('aria-expanded') === 'true', 'open state');
+    const click = new win.MouseEvent('click', { bubbles: true, cancelable: true });
+    assert(nav.querySelector('a').dispatchEvent(click) && !click.defaultPrevented, 'native link cancelled');
+    assert(nav.hidden, 'link did not close');
+    button.click(); button.click();
+    assert(nav.hidden, 'duplicate toggle effects');
+  }, { srcdoc: true });
+});
+test('Production Escape/focus return and resize while focused', async signal => {
+  await withFrame(navigationFixture, 320, signal, (doc, win) => {
+    const query = fakeMediaQuery(); initNavigation(doc, { matchMedia: () => query });
+    const button = doc.querySelector('button'), nav = doc.querySelector('nav'), link = nav.querySelector('a');
+    button.click(); link.focus();
+    link.dispatchEvent(new win.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    assert(nav.hidden && doc.activeElement === button, 'Escape focus return');
+    query.resize(true);
+    assert(!nav.hidden && button.hidden && doc.activeElement === link, 'desktop hid focused button');
+    query.resize(false);
+    assert(nav.hidden && !button.hidden && doc.activeElement === button, 'mobile hid focused link');
+  }, { srcdoc: true });
+});
+function mediaFixture(attributes = '') {
+  return `<!doctype html><html><body><div data-media-provider="disabled" ${attributes}>
+  <p>Demo coming soon</p></div><p id="description">Readable transcript of the walkthrough.</p></body></html>`;
+}
+function configure(element, provider = 'youtube', speech = false) {
+  Object.assign(element.dataset, { mediaProvider: provider, mediaPoster: 'poster.png',
+    mediaDescriptionId: 'description', mediaAccessibilityReviewed: 'true', mediaHasSpeech: String(speech) });
+  if (provider === 'youtube') element.dataset.mediaId = 'abcdefghijk';
+  else element.dataset.mediaSrc = 'demo.mp4';
+}
+const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+test('Production disabled and invalid media retain inert readable placeholders', async signal => {
+  for (const invalid of [null, 'provider', 'id', 'remotePoster', 'remoteSource', 'missingDescription',
+    'hiddenDescription', 'review', 'speech', 'captions', 'youtubeCaptions', 'missingFile', 'probeError']) {
+    await withFrame(mediaFixture(), 320, signal, async doc => {
+      const element = doc.querySelector('[data-media-provider]');
+      if (invalid) configure(element, invalid === 'remoteSource' || invalid === 'captions' ? 'self-hosted' : 'youtube');
+      if (invalid === 'provider') element.dataset.mediaProvider = 'unknown';
+      if (invalid === 'id') element.dataset.mediaId = 'bad';
+      if (invalid === 'remotePoster') element.dataset.mediaPoster = 'https://example.com/poster.png';
+      if (invalid === 'remoteSource') element.dataset.mediaSrc = '//example.com/demo.mp4';
+      if (invalid === 'missingDescription') element.dataset.mediaDescriptionId = 'absent';
+      if (invalid === 'hiddenDescription') doc.getElementById('description').hidden = true;
+      if (invalid === 'review') element.dataset.mediaAccessibilityReviewed = 'false';
+      if (invalid === 'speech') delete element.dataset.mediaHasSpeech;
+      if (invalid === 'captions' || invalid === 'youtubeCaptions') element.dataset.mediaHasSpeech = 'true';
+      let created = 0, probes = 0;
+      assert(!await initMedia(element, { exists: async () => { probes++; if (invalid === 'probeError') throw new Error('missing'); return invalid !== 'missingFile'; },
+        create: () => { created++; } }), `${invalid}: enabled invalid configuration`);
+      assert(!element.querySelector('button, iframe, video') && !created, `${invalid}: active player`);
+      if (!invalid) assert(!probes, 'disabled media issued a request');
+      assert(element.textContent.includes('Demo coming soon'), 'placeholder erased');
+    }, { srcdoc: true });
+  }
+});
+test('Production media activation, idempotence, speech reviews and provider configurations', async signal => {
+  for (const provider of ['youtube', 'self-hosted']) {
+    await withFrame(mediaFixture(), 320, signal, async (doc, win) => {
+      const element = doc.querySelector('[data-media-provider]'); configure(element, provider, true);
+      element.dataset.mediaCaptionsReviewed = 'true';
+      if (provider === 'self-hosted') element.dataset.mediaCaptionsSrc = 'captions.vtt';
+      let created = 0, supplied, callbacks;
+      const options = { exists: async () => true, create: (config, mount, handlers) => {
+        created++; supplied = config; callbacks = handlers; return () => mount.replaceChildren();
+      } };
+      const task = initMedia(element, options);
+      assert(task === initMedia(element, options), 'duplicate initialization');
+      assert(await task && !created && element.querySelectorAll('button').length === 1, 'eager/duplicate player');
+      const button = element.querySelector('button'); button.click();
+      button.dispatchEvent(new win.MouseEvent('click'));
+      assert(created === 1 && supplied.provider === provider, 'duplicate activation');
+      if (provider === 'self-hosted') assert(supplied.captions.endsWith('/captions.vtt'), 'missing captions');
+      callbacks.ready();
+      assert(element.querySelector('[role="status"]').textContent.includes(provider === 'youtube' ? 'may still be blocked' : 'Demo ready'), 'readiness claim');
+      callbacks.error();
+      assert(!button.disabled && button.textContent === 'Retry demo', 'post-ready failure');
+      assert(doc.getElementById('description').textContent.includes('Readable transcript'), 'lost transcript');
+      assert(element.querySelector('a[href]')?.textContent.includes(provider === 'youtube' ? 'YouTube' : 'directly'), 'missing direct fallback');
+    }, { srcdoc: true });
+  }
+});
+test('Production blocked playback, thrown errors, timeout and explicit retry', async signal => {
+  for (const failure of ['error', 'throw', 'timeout']) {
+    await withFrame(mediaFixture(), 320, signal, async doc => {
+      const element = doc.querySelector('[data-media-provider]'); configure(element);
+      let callbacks, created = 0, disposed = 0;
+      await initMedia(element, { exists: async () => true, timeout: 20,
+        create: (_, mount, handlers) => {
+          created++; callbacks = handlers;
+          if (failure === 'throw') throw new Error('blocked');
+          mount.append(doc.createElement('span'));
+          return () => { disposed++; };
+        } });
+      const button = element.querySelector('button'); button.click();
+      if (failure === 'error') callbacks.error();
+      if (failure === 'timeout') await delay(40);
+      assert(!button.disabled && element.querySelector('[role="status"]').textContent.includes('unavailable'), 'no failure fallback');
+      assert(!element.querySelector('.media-player').children.length, 'failed player retained');
+      assert(failure === 'throw' || disposed === 1, 'failed player not disposed');
+      callbacks?.ready(); // Late events cannot undo failure.
+      assert(!button.disabled, 'late callback revived player');
+      button.click(); assert(created === 2, 'retry failed');
+      if (failure !== 'throw') callbacks.error();
+    }, { srcdoc: true });
+  }
+});
+test('Production native video adapter keeps controls, reviewed captions and error fallback', async signal => {
+  await withFrame(mediaFixture(), 320, signal, doc => {
+    // Suppress media network calls while inspecting the actual adapter's DOM.
+    const mount = doc.createElement('div');
+    let errors = 0;
+    const originalCreate = doc.createElement.bind(doc);
+    doc.createElement = tag => {
+      const node = originalCreate(tag);
+      if (tag === 'video') node.play = async () => {}; // No network; inspect native DOM only.
+      return node;
+    };
+    const remove = createPlayer({ provider: 'self-hosted', poster: '', src: '', captions: 'captions.vtt', description: {} },
+      mount, { ready() {}, error() { errors++; } });
+    const video = mount.querySelector('video');
+    assert(video.controls && video.preload === 'none' && !video.autoplay, 'native controls/preload');
+    const track = video.querySelector('track');
+    assert(track.kind === 'captions' && track.default && track.srclang === 'en', 'caption attributes');
+    track.dispatchEvent(new Event('error'));
+    assert(errors === 1, 'caption error unhandled');
+    video.dispatchEvent(new Event('error'));
+    assert(errors === 2, 'native error unhandled');
+    remove(); assert(!mount.children.length, 'adapter removal');
+  }, { srcdoc: true });
+});
+
+test('Production YouTube adapter uses privacy-enhanced embed only on creation', async signal => {
+  await withFrame(mediaFixture(), 320, signal, doc => {
+    const mount = doc.createElement('div'); // Detached iframe never connects or contacts YouTube.
+    const remove = createPlayer({ provider: 'youtube', id: 'abcdefghijk' }, mount,
+      { ready() {}, error() {} });
+    const iframe = mount.querySelector('iframe');
+    assert(iframe.src === 'https://www.youtube-nocookie.com/embed/abcdefghijk?autoplay=1', 'wrong embed');
+    assert(iframe.title && iframe.referrerPolicy === 'strict-origin-when-cross-origin', 'iframe accessibility/privacy');
+    remove(); assert(!mount.children.length, 'iframe removal');
+  }, { srcdoc: true });
+});
+for (const route of contentRoutes) {
+  test(`${route}: production enhancement on real mobile markup`, async signal => {
+    await withFrame(`../site/${route}`, 375, signal, async doc => {
+      initNavigation(doc);
+      const button = doc.querySelector('[data-navigation-toggle]'), nav = doc.querySelector('nav');
+      assert(!button.hidden && nav.hidden, 'production HTML failed to collapse');
+      button.click(); assert(!nav.hidden, 'production HTML failed to expand');
+      button.click(); assert(nav.hidden, 'production HTML failed to close');
+      if (route === 'index.html') {
+        const demo = doc.querySelector('[data-media-provider]');
+        assert(!await initMedia(demo), 'real disabled demo enabled');
+        assert(!demo.querySelector('button, video, iframe'), 'real disabled demo created player');
+      }
+    });
+  });
 }
 
 const results = [];
@@ -122,7 +315,7 @@ const status = counts.FAIL || counts.TIMEOUT ? 'FAIL' : counts.SKIP ? 'BASELINE_
 window.browserReport = {
   status, counts, results, userAgent: navigator.userAgent, url: location.href,
   timestamp: new Date().toISOString(),
-  scope: 'WEB-03 content and WEB-02 layout; scripts disabled in real-page frames; screenshots, manual and WEB-04 checks pending',
+  scope: 'WEB-04 production interactions in controlled fixtures; four real pages with scripts disabled; manual browser/assistive/network checks remain separate',
 };
 document.getElementById('report').textContent = JSON.stringify(window.browserReport, null, 2);
 document.getElementById('summary').textContent = `${status}: ${counts.PASS} pass, ${counts.FAIL} fail, ` +

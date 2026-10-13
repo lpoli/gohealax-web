@@ -35,7 +35,7 @@ section. iOS availability is Coming Soon; do not decide its unresolved pricing p
 
 ## Legal copy
 
-WEB-04 includes this exact PROD-01 text in About, Privacy and Medical Disclaimer (ordinary HTML
+About, Privacy and Medical Disclaimer include this exact PROD-01 text (ordinary HTML
 paragraphs, readable without scripting):
 
 > GoHealaX does not diagnose, treat, cure, or prevent any condition. Configurable timings are tools,

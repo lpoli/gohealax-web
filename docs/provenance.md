@@ -115,3 +115,10 @@ selected because revision `599b377d0128fd15f233228ca54a184649a439ad` predates th
 `android/docs/play-listing/screenshots/presets.png` was inspected but not selected because its
 older layout lacks exact capture/fixture provenance. Simulated layout-reference app screens and
 locked/purchase screens remain excluded.
+
+## WEB-04 demo assets
+
+The disabled demo uses the existing byte-identical `running-timer-1.png` from the WEB-03 register
+as its local poster, with an example-data caption. No video, captions, remote thumbnail or new
+bitmap is supplied or enabled. Media review attributes remain absent; future activation requires
+revision-specific video/caption/transcript rights and accessibility evidence here.

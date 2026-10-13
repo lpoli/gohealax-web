@@ -172,3 +172,15 @@ footer { padding-bottom: 2rem; color: var(--muted); font-size: 0.9rem; }
 @media (min-width: 64rem) {
   .landing .screenshot-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+/* WEB-04: hidden always wins over flex/component styles. */
+[hidden] { display: none !important; }
+button { font: inherit; cursor: pointer; background: var(--surface); }
+button:disabled { cursor: default; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--leaf-dark); outline-offset: 4px; }
+.navigation-toggle { margin-left: 1rem; }
+.landing .demo-poster { display: block; width: min(100%, 180px); height: auto; margin: 0 auto 1rem; border-radius: 0.5rem; }
+.media-player iframe, .media-player video { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; margin-top: 1rem; }
+@media (max-width: 47.999rem) {
+  .landing .site-header nav { flex-basis: 100%; }
+}

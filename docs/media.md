@@ -1,4 +1,4 @@
-# Optional media contract (implementation in WEB-04)
+# Optional media contract
 
 Keep navigation in `site.js` and playback in a separate `media.js` ES module. No player is created
 before a visitor explicitly activates Play. Initialization must be idempotent. Essential demo
@@ -37,3 +37,24 @@ Cover missing/invalid configuration, all providers, duplicate initialization/act
 before click, captions, blocked playback, error and timeout fallback. Real-page Network inspection is
 a separate gate; adapter tests do not prove it. Record approved changes to these attributes here when
 implementation reveals a necessary refinement.
+
+## Implementation and editing
+
+`site/media.js` exports `mediaConfiguration`, `initMedia` and the native `createPlayer` adapter.
+Initialization reuses one promise per element and checks local asset existence with same-origin HEAD
+requests only for a complete reviewed candidate. Disabled/invalid candidates create no control or
+player; the current disabled demo performs no probes. HEAD checks establish file availability, not
+media quality or rights. Player creation and video body/YouTube requests require explicit Play.
+
+Failures and a 12-second player timeout expose Retry, retain the description and remove the failed
+player. Local video retains an explicit direct-file link; YouTube retains an explicit watch link. Late callbacks cannot revive a failed
+attempt. YouTube iframe load clears the loading timer but explicitly does not claim playback success;
+the description and fallback remain visible for a blocked embed. Native video and caption errors
+use the same fallback. Current native caption labels are English; review an English WebVTT file or
+extend the language contract before configuring other languages.
+
+To enable a future demo, review the exact assets and record rights/accessibility evidence in
+[provenance](provenance.md), update the HTML attributes and placeholder copy in `site/index.html`,
+then review [Privacy](../site/privacy-policy.html) and run the browser/manual gates. No reviewed
+video or captions are supplied now. The local poster reuses the WEB-03 running-timer screenshot;
+no new asset or permission claim is introduced.
