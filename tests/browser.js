@@ -34,15 +34,30 @@ test('Landing homepage is retrievable and its HTML link target resolves', async 
     .every(id => doc.getElementById(id)), 'landing section missing');
 });
 
-test('About and Privacy navigation destinations agree', async signal => {
+test('Landing, About and Privacy navigation destinations agree', async signal => {
   const routes = [];
-  for (const route of ['About.html', 'privacy-policy.html']) {
+  for (const route of contentRoutes) {
     const doc = await fetchPage(`../site/${route}`, signal);
     routes.push([...doc.querySelectorAll('nav a[href]')].map(a => a.getAttribute('href')).sort());
   }
   assert(routes[0].length > 0, 'no navigation destinations');
-  assert(JSON.stringify(routes[0]) === JSON.stringify(routes[1]), 'navigation differs');
+  assert(routes.every(links => JSON.stringify(links) === JSON.stringify(routes[0])), 'navigation differs');
 });
+
+for (const route of ['index.html', 'About.html']) {
+  test(`${route}: WEB-03 product copy and availability in HTML`, async signal => {
+    const doc = await fetchPage(`../site/${route}`, signal);
+    const text = doc.querySelector('main').textContent;
+    for (const phrase of ['Count Pace', 'seconds per count', 'zero counts',
+      'while the app is open', 'planned and completed sets', 'do not measure recovery',
+      'All current Android features are free', 'Android download link coming soon', 'Coming Soon']) {
+      assert(text.includes(phrase), `missing product explanation: ${phrase}`);
+    }
+    assert(!text.includes('pilot release'), 'obsolete release claim');
+    assert(!doc.querySelector('a[href*="play.google.com"], a[href*="apps.apple.com"]'),
+      'unverified store action');
+  });
+}
 
 for (const route of contentRoutes) {
   test(`${route}: HTML landmarks, working local links and contact`, async signal => {
@@ -107,7 +122,7 @@ const status = counts.FAIL || counts.TIMEOUT ? 'FAIL' : counts.SKIP ? 'BASELINE_
 window.browserReport = {
   status, counts, results, userAgent: navigator.userAgent, url: location.href,
   timestamp: new Date().toISOString(),
-  scope: 'WEB-02 layout; scripts disabled in real-page frames; manual and WEB-04 checks deferred',
+  scope: 'WEB-03 content and WEB-02 layout; scripts disabled in real-page frames; screenshots, manual and WEB-04 checks pending',
 };
 document.getElementById('report').textContent = JSON.stringify(window.browserReport, null, 2);
 document.getElementById('summary').textContent = `${status}: ${counts.PASS} pass, ${counts.FAIL} fail, ` +

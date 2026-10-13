@@ -158,3 +158,17 @@ footer { padding-bottom: 2rem; color: var(--muted); font-size: 0.9rem; }
   .landing .download { grid-template-columns: 1.3fr 1fr; align-items: center; }
   .landing .platforms { grid-template-columns: 1fr; }
 }
+
+/* WEB-03: uncropped owner-provided app captures, readable at their native width. */
+.landing .app-gallery { margin-top: 3rem; }
+.landing .screenshot-grid { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr); }
+.landing .app-screenshot { margin: 0; min-width: 0; max-width: 359px; justify-self: center; }
+.landing .app-screenshot img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 0.75rem; }
+.landing .app-screenshot figcaption { padding: 0.75rem 0; font-size: 0.85rem; }
+.landing .app-screenshot p { margin: 0.4rem 0 0; }
+@media (min-width: 48rem) {
+  .landing .screenshot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 64rem) {
+  .landing .screenshot-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}

@@ -28,10 +28,10 @@ class ExistingSiteTests(unittest.TestCase):
 
     def test_navigation_destinations_are_consistent(self):
         destinations = []
-        for route in ("About.html", "privacy-policy.html"):
+        for route in ("index.html", "About.html", "privacy-policy.html"):
             nav = read_document(SITE / route).find("nav")[0]
             destinations.append({n.attrs.get("href") for n in nav.find("a")})
-        self.assertEqual(destinations[0], destinations[1])
+        self.assertTrue(all(links == destinations[0] for links in destinations))
         self.assertTrue({"About.html", "privacy-policy.html"} <= destinations[0])
 
     def test_contact_is_available_in_html(self):

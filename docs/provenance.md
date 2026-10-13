@@ -9,7 +9,7 @@ screenshot, video and social image here before publication. Required licence not
 | Layout reference | Owner-supplied `web/image-ref/web-design-layout.png`, inspected 2026-10-12 | Layout reference only; redistribution rights unknown | Excluded; never extract imagery or app screens |
 | Existing branding | [Branding register](../../design/branding/README.md) | Author/distribution rights unrecorded | Launch blocked until confirmation; do not mark approved |
 | Native screenshots | [Screen register](../../design/screens/README.md), `design/screens/manifest.json` | Must inspect revision, synthetic data and obsolete paid/locked UI | No screenshot selected yet |
-| Hero photo | Mikhail Nilov / Pexels 7500034; details below | Pexels licence reviewed; owner approval pending | Local layout candidate |
+| Hero photo | Mikhail Nilov / Pexels 7500034; details below | Pexels licence reviewed; owner approved 2026-10-12 | Local layout asset |
 | Demo poster | Not selected | Review due WEB-04 if needed | No public asset |
 
 For every selected asset record:
@@ -52,7 +52,8 @@ must also have its authorship and publication permission recorded.
 | `site/assets/hero-1200.webp` | 1200×1800 | `649bcf818f67916e6c8e5db6dcfe060fc60167f988a2d94c70802f6b004c862d` |
 
 Credit and licence links appear in the landing footer; a hero caption disclaims endorsement.
-Owner layout/imagery approval: **pending**, no date or publication approval inferred.
+Owner layout/imagery approval: **approved 2026-10-12**, by explicit WEB-02 approval.
+This is local deliverable acceptance; publication remains gated on WEB-07.
 
 ### Original branding and decoration
 
@@ -60,6 +61,57 @@ Owner layout/imagery approval: **pending**, no date or publication approval infe
 lowercase “g”, and two original SVG wave paths. Created by the coding agent in this repository on
 2026-10-12; no existing branding, reference pixels or third-party icon paths copied. System fonts
 only; no font files distributed. These inline/CSS assets have no separate bitmap dimensions or
-file hashes. Owner acceptance and publication permission for this new artwork remain **pending**.
+file hashes. Owner acceptance of the local artwork: **approved 2026-10-12**, with WEB-02.
+External publication remains gated on WEB-07.
 No native screenshot or demo poster selected. Existing branding rights remain unresolved if that
 artwork is chosen later; it is not used in this landing page.
+
+## WEB-03 screenshot review (2026-10-12)
+
+The owner supplied five app screenshots in `web/image-ref/screenshots/` for website use. The agent
+visually inspected all five at full supplied resolution. No identifying personal data, obsolete
+purchases or feature locks are visible. `running-timer-2.png` actually shows the Ready/Idle state;
+it remains an unused original to avoid duplicating the timer view. No owner originals were changed.
+
+Four selected PNGs are copied byte-for-byte into `site/assets/screenshots/`. No generated UI,
+compositing, retouching, cropping, resizing or compression was applied. Each has dimensions 359×801;
+CSS scales proportionally without cropping. They use lazy loading, useful alt text and the caption
+“Example exercise data, not an exercise prescription.” The landing feature section owns the gallery;
+About links to it. The exact paths, original/delivered hashes, timestamps and review evidence are in
+`web/asset-sources/screenshots.json` (outside the deployable source).
+
+Capture/build evidence:
+
+- Owner-reported revision: current commit `6c08b133dd2079f7899c7ac8b6946a7656aa503d`;
+  Web development does not alter Android. Latest app change in that tree:
+  `3f1f0f7f5002ded98bfd7415771f93ace521c49a` (FREE-2). Repository-declared version 1.2/code 3;
+  installed APK identity was not independently inspected.
+- Owner confirmed exercises/activity came from the generated inspection fixture,
+  `android/gohealax-inspection-backup.json`. Current repository SHA-256:
+  `5757fe13f279e42926e548a819a85cb696ca7450377084cc93b88add9421a610`.
+  This is owner-supplied synthetic data, not a supplied exercise prescription.
+- PNG metadata identifies `gnome-screenshot`, with capture times on 2026-10-12 between
+  20:53:52 and 20:55:19, timezone +05:45. These are owner-supplied screen/window captures,
+  not claimed to be raw Android `screencap` output. The visible thin window edges are preserved.
+- Android 17 is the owner's tentative OS recollection, not independently verified; it is not the
+  app version. No new native capture or device test was run by the agent.
+- Local website use is authorized by the owner's submission in this task. Final gallery acceptance
+  is pending WEB-03 approval; external publication remains gated on WEB-07. No blanket ownership
+  or publication-rights claim is inferred for native branding.
+
+| Delivered filename | Original = delivered SHA-256 |
+|---|---|
+| `running-timer-1.png` | `08b13126fa85af644ecd7da0f25d239bbce567a55f71079c6cc5e77d3fa87719` |
+| `preset.png` | `3f3298c9b50ffe705c801e210f3b0f9dd9d244ff8e1be3665cf1b1667b54afcd` |
+| `todays-exercises.png` | `7f92c89cac8cb064173a793c3589c1ed6797ea996efcac32e6a734d95f66acbe` |
+| `statistics.png` | `52b9ad307423722325aeeb8f75d8007e2fb6b7c64a2cbc11cad356cc45826dba` |
+
+Agent inspection of the rendered gallery: Chrome 154.0.8037.92 on Linux at 375×1400 and 1440×1400;
+stacked mobile and four-column desktop layouts, uncropped images and readable captions. All four
+images decoded at both widths with no horizontal overflow. Evidence is in the Web handoff.
+
+Older candidate review retained: `design/screens/presets-populated.png` was inspected but not
+selected because revision `599b377d0128fd15f233228ca54a184649a439ad` predates the free transition.
+`android/docs/play-listing/screenshots/presets.png` was inspected but not selected because its
+older layout lacks exact capture/fixture provenance. Simulated layout-reference app screens and
+locked/purchase screens remain excluded.

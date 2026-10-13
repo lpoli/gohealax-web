@@ -2,14 +2,103 @@
 
 Updated: 2026-10-12. Milestone status and approval authority: [roadmap](roadmap.md).
 WEB-02 startup: clean `web-development` branch at `2a360fa`. WEB-01 history below retains its
-original evidence. WEB-02 source/documentation changes are uncommitted; nothing pushed.
+original evidence. WEB-02 was committed as `6c08b13`. WEB-03 began from that clean revision on
+`web-development`; its changes are uncommitted. Nothing pushed.
 
 ## Current increment
 
 WEB-01 established the documentation and verification baseline and was explicitly approved by the
 owner on 2026-10-12. All seven milestone descriptions were created before checker/runner
 implementation. WEB-02 replaces the index redirect with the responsive landing composition. Owner layout/imagery
-approval is pending; WEB-03 remains gated.
+approval was granted explicitly on 2026-10-12. WEB-03 content and screenshot presentation are implemented; owner
+wording/gallery approval is pending. See the evidence below.
+
+## WEB-03 startup and verification
+
+Owner approval, 2026-10-12 (user-reported): “Approve WEB-02 and start WEB-03”. This approves
+WEB-02's current layout and imagery and authorizes WEB-03. It does not establish individual manual
+browser/assistive results or authorize publication. WEB-02's pending-review wording below describes
+its original handoff; the roadmap and this approval record supersede it.
+
+Implemented: complete landing feature explanations and standalone About; phase skipping, pace
+units/example, repetition/set/session structure, seconds-based set rest, presets, Today targets,
+weekday/one-time schedules while open, History and recorded Statistics/adherence. Removed the old
+unverified Google Play availability and pilot-release claims. Free Android and iOS Coming Soon,
+contributor placeholders, source editing comments and readable email remain explicit. Landing,
+About and Privacy now share HTML navigation destinations, with legal-page brand links returning
+home. Privacy disclosures were not edited. No production JavaScript, publishing or DNS changes.
+
+Copy was checked against the shared TMR/DATA/HIST/STAT requirements, ADR-0007 and current Android
+`docs/product-spec.md`, `CountPace.kt` and `TimerSessionSequence.kt`. No shared/native behavior changed.
+
+Agent-run, Linux, 2026-10-12:
+
+| Check | Result |
+|---|---|
+| `python3 -m unittest discover -s web/tests -p 'test_*.py'` | PASS: 26 tests; new content tests first failed against old copy, then passed |
+| `python3 web/tests/audit.py` | Exit 1: 8 residual WEB-04/05 findings (same legal/metadata/route scope as WEB-02); screenshot rights/currentness is a separate review blocker |
+| `python3 scripts/check-doc-links.py` | PASS: recorded after handoff edits |
+| `git diff --check` | PASS: recorded after handoff edits |
+| Chrome 154.0.8037.92 headless `/tests/browser.html` | 24 PASS / 0 FAIL / 0 TIMEOUT / 4 explicit WEB-04 SKIP |
+
+Browser timestamp: `2026-10-12T14:39:29.292Z`. Includes added product-copy/availability checks,
+three-page navigation consistency, loaded styling and scripts-disabled widths 320/375/768/1024/1440.
+Chrome crashed with exit 133 inside the sandbox; tool-approved execution outside it passed. Exact
+server command is below; browser invocation:
+
+```sh
+env TMPDIR=/home/lpoli/workspace/gohealax/web/.artifacts/tmp XDG_CONFIG_HOME=/home/lpoli/workspace/gohealax/web/.artifacts/config XDG_CACHE_HOME=/home/lpoli/workspace/gohealax/web/.artifacts/cache google-chrome --headless --disable-gpu --disable-dev-shm-usage --disable-breakpad --disable-crash-reporter --disable-background-networking --disable-component-update --no-first-run --no-default-browser-check --user-data-dir=/home/lpoli/workspace/gohealax/web/.artifacts/chrome-web03 --disk-cache-dir=/home/lpoli/workspace/gohealax/web/.artifacts/cache-web03 --crash-dumps-dir=/home/lpoli/workspace/gohealax/web/.artifacts/crashes --virtual-time-budget=30000 --dump-dom http://127.0.0.1:8000/tests/browser.html > web/.artifacts/browser-chrome-web03.html 2> web/.artifacts/browser-chrome-web03.log
+```
+
+HTML/JSON reports, logs and profiles stay under ignored `web/.artifacts/`. The runner tab requested
+`/favicon.ico` (404, WEB-05); this was not a clean DevTools network review. Preview server stopped at
+handoff. No native builds/device tests or shared requirement edits; iOS verification not needed.
+
+## WEB-03 owner revisions and screenshot completion
+
+Owner requested exercise/routine tracking wording and the exact feature sentence “User can totally
+focus on exercise rather than mental counting.” Both are now in homepage/About HTML. The removed
+pilot-release wording remains absent. The owner's “actual release” correction is recorded in the
+content guide; Google Play availability remains unverified and the download placeholder is retained.
+
+The owner supplied five screenshots and confirmed current-commit Android code with exercises/activity
+from the generated inspection fixture. Four were selected for the landing gallery: running Hold
+phase, Presets, Today's Exercises and Statistics. The second timer image is Ready/Idle and was not
+selected. All originals are preserved; deliverable PNGs are byte-identical copies. Capture metadata,
+owner-reported revision, repository version, fixture identity/hash and visual inspection are recorded
+in [provenance](provenance.md#web-03-screenshot-review-2026-10-12) and the asset register. Android 17
+is a tentative owner OS recollection, not an independently verified fact.
+
+Latest agent-run checks, Linux/Chrome 154.0.8037.92, 2026-10-12:
+
+| Check | Result |
+|---|---|
+| `python3 -m unittest discover -s web/tests -p 'test_*.py'` | PASS: 28 tests, including requested wording, screenshot hashes/original equality, PNG dimensions, alt text/lazy loading and example captions |
+| `python3 web/tests/audit.py` | Exit 1: 8 residual WEB-04/05 legal/metadata/route findings |
+| `python3 scripts/check-doc-links.py` | PASS: 90 Markdown files |
+| `git diff --check` | PASS |
+| Browser runner after wording/gallery changes | 24 PASS / 0 FAIL / 0 TIMEOUT / 4 explicit WEB-04 SKIP; timestamp `2026-10-12T15:42:10.902Z` |
+| Isolated headless gallery check | PASS at 375×1400 and 1440×1400: all four images decoded, no horizontal overflow; screenshots visually inspected |
+
+Browser runner command matches the earlier WEB-03 invocation, with profile/cache/report suffix
+`web03-images`. Reports are `web/.artifacts/browser-chrome-web03-images.html` and `.json`.
+Command-line gallery captures twice produced blank PNGs and were rejected as visual evidence.
+The final gallery check ran `node web/.artifacts/inspect-gallery.mjs` after user-requested security
+review and explicit tool approval. The reviewed script launches its own headless Chrome with a new
+profile and random local debugging port; it does not attach to personal Chrome or use personal tabs,
+history, cookies or logins. It creates its own tab, disables page scripts, blocks page requests
+outside local `/site/`, validates debugging URLs, refuses output overwrites, uses bounded timeouts
+and closes its own browser. The browser process is closed; the profile is retained only in ignored
+artifacts. This script is temporary QA tooling, not a website dependency or deployable asset.
+
+Final visual artifacts: `web/.artifacts/gallery-check-6N6Jev/gallery-reviewed-mobile.png` and
+`gallery-reviewed-desktop.png`, with corresponding JSON reports. Gallery originals, full-resolution
+review, layout inspection and example captions are complete. Normal browser tabs were not involved.
+
+**Owner review remains:** final wording, gallery and editable source locations. WEB-03 awaits approval;
+WEB-04 has not started. Firefox, real mobile, manual keyboard/assistive, zoom/orientation, DevTools
+Network/console and Lighthouse checks remain not run. No native build/device test, publication or DNS
+change occurred. Preview server stopped at handoff.
 
 ## WEB-02 verification and review
 
@@ -128,9 +217,9 @@ Owner approval, 2026-10-12 (user-reported): “looks good to me. I approve WEB-0
 approves the foundation documentation and recorded baseline with its limits. Detailed browser versions
 and per-check manual results were not provided; later manual/release gates remain applicable.
 
-The approval is recorded in the roadmap. WEB-02 was subsequently requested and implemented on
-`web-development` at `2a360fa`; its concrete layout is now awaiting owner approval. Review the
-WEB-02 evidence above before WEB-03. The seven-milestone gate is still in force.
+The approval is recorded in the roadmap. WEB-02 was subsequently implemented and committed as `6c08b13`, then explicitly approved on
+2026-10-12 as recorded above. WEB-03 is the current increment; finish screenshot acceptance and
+owner review before WEB-04. The seven-milestone gate remains in force.
 
 ## Blockers and owner inputs
 

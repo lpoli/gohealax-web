@@ -5,8 +5,9 @@ through GitHub Pages. Plain HTML, CSS and JavaScript; no framework, package mana
 Decision: [ADR-0008](../docs/decisions/0008-static-informational-website.md).
 
 Start with [Web instructions](AGENTS.md), [roadmap](docs/roadmap.md) and [handoff](docs/handoff.md).
-The roadmap owns the seven approval gates. WEB-02 replaces the homepage redirect with a responsive landing page; owner layout approval is
-pending. Later increments follow the roadmap gates.
+The roadmap owns the seven approval gates. WEB-02 replaces the homepage redirect with an owner-approved responsive landing page. WEB-03
+product/About copy and screenshot gallery are implemented; owner review is pending. Later
+increments follow the roadmap gates.
 
 ## Source and documentation
 
@@ -18,6 +19,7 @@ pending. Later increments follow the roadmap gates.
 | [Media](docs/media.md) | Optional accessible player configuration (WEB-04) |
 | [Provenance](docs/provenance.md) | Image, branding, screenshot and media rights/review |
 | [Testing](docs/testing.md) | Offline checks, browser runner and manual gates |
+| [Web todos](docs/todos.md) | Owner-requested follow-ups after Web development is complete |
 | [Deployment](docs/deployment.md) | Planned deterministic export, publication, DNS/HTTPS and rollback |
 | `tests/` | Standard-library static checks and dependency-free browser runner |
 | `image-ref/` | Owner reference material, never deployable |

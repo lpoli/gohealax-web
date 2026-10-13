@@ -9,10 +9,10 @@ website does not implement a native timer or imply clinical outcomes.
 
 | Area | Required message | Editing location after implementation |
 |---|---|---|
-| Hero/benefits | Support a user-chosen exercise routine with configurable timing | `site/index.html`, `#home` and benefits section |
+| Hero/benefits | Time and track user-chosen exercises and routines | `site/index.html`, `#home` and benefits section |
 | Demo | “Demo coming soon” until accessible media is approved | `site/index.html#demo`; configuration in [media.md](media.md) |
 | Mission | GoHealaX means “Go heal and relax”; support following a routine, no recovery promise | `site/index.html#mission`, `site/About.html` |
-| Features | Prepare, Hold, Relax; repetitions, sets, Count Pace, presets, daily planning, schedules, history and recorded activity | `site/index.html#features`, `site/About.html` |
+| Features | Prepare, Hold, Relax; repetitions, sets, Count Pace, presets, daily planning, schedules, history and recorded activity; focus on exercise rather than mental counting | `site/index.html#features`, `site/About.html` |
 | Download | “All current Android features are free”; “Android download link coming soon”; iOS “Coming Soon” | `site/index.html#download` and hero availability copy |
 | Team | Honest contributor placeholder; no invented names, credentials or endorsements | `site/index.html#team`, with a source comment marking contributor edits |
 | Contact | `mailto:b.lp.self@gmail.com` with readable email address | `site/index.html#contact`, About and Privacy |
@@ -23,6 +23,11 @@ planning; do not promise closed-app reminders. History and statistics show recor
 recovery measurements. Users create their own exercises; no catalogue, supplied exercise plan or
 medical advice. Captions on synthetic screenshots say “Example exercise data, not an exercise
 prescription.” Do not show obsolete purchase controls or locked-feature screens.
+
+Owner wording decision (2026-10-12): the product is an actual release, not a pilot. Do not use
+“pilot release” in public copy. State that GoHealaX tracks exercises/routines and include:
+“User can totally focus on exercise rather than mental counting.” This describes the purpose of
+timer cues; it does not claim a clinical outcome.
 
 The actual Google Play listing has not been verified. Until it is, do not claim availability, invent
 a store URL or make a store badge/action appear enabled. A navigation link may go to the download

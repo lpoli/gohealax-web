@@ -29,7 +29,9 @@ to preserve. Never assert a defect must exist and never make it disappear by bla
 
 Promote resolved audit rules into mandatory tests in the milestone that fixes them. WEB-02 enforces
 landing section order, no redirect, visible HTML links, honest availability and local responsive hero
-assets; WEB-03 content/availability/screenshot review; WEB-04 disclaimer and
+assets; WEB-03 now enforces product explanations, availability, contributor/social editing locations and
+three-page navigation consistency. Screenshot asset hashes, equality to owner originals, PNG dimensions, alt text, lazy loading and
+example captions are enforced. Owner-reported build/fixture evidence lives in the provenance register; WEB-04 disclaimer and
 interaction cases; WEB-05 metadata, image dimensions, sitemap and complete route coverage. By WEB-05
 the audit must pass. WEB-06 adds exporter tests (including symlinks, reproducibility and stale files).
 
