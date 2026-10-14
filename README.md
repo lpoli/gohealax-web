@@ -7,7 +7,7 @@ Decision: [ADR-0008](../docs/decisions/0008-static-informational-website.md).
 Start with [Web instructions](AGENTS.md), [roadmap](docs/roadmap.md) and [handoff](docs/handoff.md).
 The roadmap owns the seven approval gates. WEB-02 replaces the homepage redirect with an owner-approved responsive landing page. WEB-03
 product/About copy and screenshot gallery were approved on 2026-10-13. WEB-04 navigation, media
-support and legal pages and WEB-05 quality were approved on 2026-10-13. WEB-06 release preparation was approved on 2026-10-13; WEB-07 launch preflight is underway; owner publication and live acceptance remain pending. Later
+support and legal pages and WEB-05 quality were approved on 2026-10-13. WEB-06 release preparation was approved on 2026-10-13; WEB-07 is deployed and automated live verification passed; final owner acceptance/account checks remain pending. Later
 increments follow the roadmap gates.
 
 ## Source and documentation
@@ -45,7 +45,8 @@ LAN mode serves only website files. Details and the required Guest/sandbox polic
 The audit reports target-quality gaps independently of the current regression gate; exit 1 is an
 unresolved finding, not a passing release. See the handoff for actual evidence.
 
-The repository does not verify current hosting or Play availability. Keep the exact case-sensitive
+Live hosting is verified in the [WEB-07 handoff](docs/handoff.md#web-07-deployed-site-verification);
+Play availability remains unverified. Keep the exact case-sensitive
 `About.html` and `privacy-policy.html` routes. App privacy disclosures must remain aligned with
 [privacy principles](../docs/security/privacy.md) and Android's policy; website-only disclosures are
 separate. No deployment, DNS or external publication is part of WEB-01.

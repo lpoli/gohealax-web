@@ -907,3 +907,45 @@ account verification TXT, then manually run Publish approved website on `main` w
 manifest hash. No API credentials are available to perform these account actions here. Public
 source synchronization is complete; deployment/domain/HTTPS/live verification and owner approval
 remain pending. No old repository clone/cleanup or inbound synchronization occurred.
+
+## WEB-07 deployed site verification
+
+On 2026-10-14 the owner reports deployment complete and can view `https://gohealax.com`.
+Agent independently verified the public Actions run and deployment:
+
+- [Actions run 38584129419](https://github.com/lpoli/gohealax-web/actions/runs/38584129419):
+  completed successfully; created `2026-10-14T14:50:38Z`, updated `2026-10-14T14:51:32Z`.
+- Pages deployment `7068744264`: created `2026-10-14T14:51:05Z`, latest status success.
+- Deployed public revision `8b87a859a86a3faf2261a62133528dda1171be77`, corresponding to monorepo
+  `4709310`; approved manifest SHA-256
+  `9a2b92b3757712d130d1f2205c41bce36fa6a7c0e296628b253dc3730fd21aef`.
+
+Agent-run live GET checks with standard TLS verification: all 22 served content files match
+approved manifest SHA-256 hashes byte for byte: landing, exact-case About, Privacy, Disclaimer,
+404, CSS, both JS modules, robots/sitemap and all reviewed images/icons. The package's `CNAME`
+and `.nojekyll` are hosting markers and were not treated as content routes. An unknown nested
+URL returns HTTP 404 and the exact approved 404 document. HTTP apex and HTTPS `www` both resolve
+to HTTPS apex with final HTTP 200. `docs/handoff.md`, `tests/browser.html`, README and native
+component route probes return 404: the source mirror is not the hosted artifact.
+
+Contact/download and disabled-demo markup matches the approved package; no store/demo release
+claim was added. Live browser console/network, keyboard, desktop/mobile and assistive checks
+have not been repeated by the agent. Owner visibility report is distinct from final acceptance.
+
+Current recursive Google DNS-over-HTTPS evidence matches existing routing: four expected GitHub
+Pages A records, `www` → `lpoli.github.io`, the same two Namecheap NS, five forwarding MX records
+and apex SPF TXT; no apex AAAA/CAA answers. The account challenge TXT now resolves (one answer),
+unlike the earlier NXDOMAIN preflight. Its value remains only in ignored local evidence. Presence
+of TXT alone does not prove GitHub account verification succeeded. Authoritative direct DNS and
+full DNS-zone review remain owner confirmation; no DNS records were changed by the agent.
+
+Saved sanitized/raw evidence stays under ignored `web/.artifacts/web-07/`: deployed Actions and
+GitHub deployment JSON, deployment statuses, per-record DNS JSON and `live-package-verification.json`.
+Network check scripts also stay there. No credentials, TXT verification value, reference artifacts
+or native/shared files were published by these checks.
+
+Remaining acceptance: owner confirms live desktop/mobile, keyboard, console/network and final
+approval, account-level verified-domain status, Enforce HTTPS and retained TXT/mail/zone records.
+A concise confirmation request has been sent. Do not mark WEB-07 Complete from the successful
+workflow or visibility report alone. Content rollback uses a previous approved artifact through the
+new mirror/Actions procedure; the deleted old repository is not a rollback target.
