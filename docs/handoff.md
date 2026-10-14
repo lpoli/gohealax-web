@@ -887,3 +887,23 @@ Every split-history root was checked to exclude Android, iOS, backend and monore
 Standalone archive of this split, tested without the monorepo requirements: 51 tests PASS;
 audit zero findings; export/check PASS (24 files); approved manifest verifier PASS, same approved hash.
 Standalone commands use the documented root commands with the `web/` prefix omitted.
+
+### First source synchronization
+
+First Web-only push succeeded on 2026-10-14: monorepo `0884e35` → public `main`
+`5a28368feaac3146eb311ef6ba2c17cccf7e3c34`, root tree
+`01ce50ee1f6ce977091164f3612b639e7d456803`. The root tree exactly equals committed `web/`;
+all exported history roots exclude native components and shared root documents. Destination had
+no refs immediately before push; the push created `main` normally, without force or history rewrite.
+No deployment was triggered. `ssd`, `mycc` and branch tracking remain unchanged.
+
+Executed `git subtree push --prefix=web webgithub main` with a per-command SSH override for
+`ssh.github.com:443`, BatchMode/strict host checking and workspace-local known hosts populated
+from GitHub's HTTPS API. No global SSH/config changes or writes outside the working directory.
+The ordinary remote URL remains `git@github.com:lpoli/gohealax-web.git`.
+
+Owner action requested: configure Pages source as GitHub Actions, set `gohealax.com`, preserve
+account verification TXT, then manually run Publish approved website on `main` with the approved
+manifest hash. No API credentials are available to perform these account actions here. Public
+source synchronization is complete; deployment/domain/HTTPS/live verification and owner approval
+remain pending. No old repository clone/cleanup or inbound synchronization occurred.

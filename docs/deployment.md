@@ -33,6 +33,17 @@ If direct GitHub edits cause divergence, stop and resolve the destination with t
 the next synchronization. Existing private remotes and branch tracking stay unchanged.
 See [Git subtree documentation](https://github.com/git/git/blob/master/contrib/subtree/git-subtree.adoc).
 
+On this development host port 22 did not complete. The verified push used a per-command SSH
+override; the ordinary remote URL and existing private remote configuration stay unchanged:
+
+```sh
+git -c core.sshCommand='ssh -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/home/lpoli/workspace/gohealax/web/.artifacts/web-07/known_hosts -o GlobalKnownHostsFile=/dev/null -p 443 -o Hostname=ssh.github.com' subtree push --prefix=web webgithub main
+```
+
+That workspace-local known-hosts file was populated from GitHub's HTTPS API `/meta` SSH keys.
+It is ignored local state, not part of the source mirror. Other hosts can use the ordinary subtree
+command when their SSH configuration already permits GitHub access.
+
 ## Manual GitHub Actions publication
 
 The source workflow is [pages.yml](../.github/workflows/pages.yml); subtree export places it at
