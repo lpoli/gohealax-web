@@ -949,3 +949,23 @@ approval, account-level verified-domain status, Enforce HTTPS and retained TXT/m
 A concise confirmation request has been sent. Do not mark WEB-07 Complete from the successful
 workflow or visibility report alone. Content rollback uses a previous approved artifact through the
 new mirror/Actions procedure; the deleted old repository is not a rollback target.
+
+## WEB-07 final owner approval
+
+On 2026-10-14, after successful deployment and the automated live checks above, the owner explicitly
+states: “I approve the final live-site as well.” This approves the deployed deliverable and completes
+WEB-07. The Web roadmap is the milestone-status authority; all WEB-01…07 are now Complete.
+
+Approval applies to the verified site deployed from public revision
+`8b87a859a86a3faf2261a62133528dda1171be77`, manifest SHA-256
+`9a2b92b3757712d130d1f2205c41bce36fa6a7c0e296628b253dc3730fd21aef`.
+Later source pushes record documentation only and do not redeploy or change the approved site bytes.
+
+Preserve the disclosed evidence limits: no separate owner report of specific desktop/mobile,
+keyboard/console/network checks, account verified-domain UI, Enforce HTTPS UI or authoritative
+full-zone audit was supplied. Do not infer those reports from the final approval. Automated TLS,
+HTTP/www redirects, served-file hashes, custom 404, successful deployment, recursive DNS and
+challenge TXT evidence remain as recorded above. Account/UI and authoritative-zone confirmations
+remain operational follow-ups, not claims of verification. No DNS or hosting settings were changed
+by the agent. [Web todos](todos.md) owns the owner-requested subsequent content work; none is started
+by this approval. One-way local-to-public source synchronization remains the publishing workflow.
