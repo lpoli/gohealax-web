@@ -870,6 +870,20 @@ python3 web/scripts/verify-approved-release.py --manifest-sha256 9a2b92b3757712d
 python3 scripts/check-doc-links.py
 ```
 
-Synchronization/standalone verification and old-repository cleanup results are recorded below
-when executed. Public revision and deployment evidence are separate; do not infer deployment
+Synchronization/standalone verification results are recorded below when executed.
+Old-repository cleanup is obsolete because the owner reports deleting that repository. Public revision and deployment evidence are separate; do not infer deployment
 from a successful source push. Earlier launch-preflight evidence describes the old hosting only.
+
+### Resumed validation and owner clarification
+
+The owner confirms synchronization is strictly one way, local monorepo `web/` → `gohealax-web`,
+and reports the old `lpoli/gohealax` repository already deleted. No clone or cleanup of the old
+repository was executed. Its historical backup is preserved. No pulling or merging mirror changes
+into the monorepo; unexpected destination divergence must be resolved with the owner.
+
+Committed implementation: `0cae640`. Initial split: `8b68ef491a6a8ea6058427a0ffabfdfc447006c2`.
+Its root tree and `0cae640:web` both equal `92f3f8b5fb1178f7142bef7d39d1a0593d325a30`.
+Every split-history root was checked to exclude Android, iOS, backend and monorepo root documents.
+Standalone archive of this split, tested without the monorepo requirements: 51 tests PASS;
+audit zero findings; export/check PASS (24 files); approved manifest verifier PASS, same approved hash.
+Standalone commands use the documented root commands with the `web/` prefix omitted.

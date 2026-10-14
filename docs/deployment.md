@@ -27,9 +27,10 @@ git subtree push --prefix=web webgithub main
 
 The two tree hashes must match. Inspect the split root and confirm only Web files are present.
 Before the first push, inspect the destination history: if it has conflicting initial commits,
-stop and reconcile them with the owner. Never overwrite that history. Subsequent pushes are normal
-fast-forward updates. Develop in the monorepo; direct GitHub edits cause divergence and must be
-reconciled before the next synchronization. Existing private remotes and branch tracking stay unchanged.
+stop and resolve the destination state with the owner. Never overwrite that history. Subsequent pushes are normal
+fast-forward updates. Develop only in the monorepo. Never pull or merge public-mirror changes back into it.
+If direct GitHub edits cause divergence, stop and resolve the destination with the owner before
+the next synchronization. Existing private remotes and branch tracking stay unchanged.
 See [Git subtree documentation](https://github.com/git/git/blob/master/contrib/subtree/git-subtree.adoc).
 
 ## Manual GitHub Actions publication
@@ -96,10 +97,10 @@ manifest hash and monorepo revision before publishing. Export approval is not pe
 
 ## Domain and HTTPS (WEB-07)
 
-Prepare and validate the new repository/workflow before transferring `gohealax.com` from
-`lpoli/gohealax`. Confirm authenticated administrative access and account-level domain verification.
-Retain GitHub's verification TXT and all unrelated/email records. Save old/new Pages settings and
-DNS evidence before mutation. Source `CNAME` is retained in the approved artifact, but GitHub Actions
+The owner reports that `lpoli/gohealax` has already been deleted. No old-repository clone, cleanup
+or domain-setting mutation is needed. Prepare and validate the new repository/workflow, then
+configure `gohealax.com` on `lpoli/gohealax-web`. Confirm authenticated administrative access and account-level domain verification.
+Retain GitHub's verification TXT and all unrelated/email records. Retain historical hosting evidence and record current Pages settings/DNS before mutation. Source `CNAME` is retained in the approved artifact, but GitHub Actions
 uses the repository Pages custom-domain setting; `CNAME` alone does not configure the domain.
 
 1. Recheck authoritative NS, apex A/AAAA/CAA/MX/TXT, `www` CNAME and the account challenge TXT.
@@ -107,9 +108,9 @@ uses the repository Pages custom-domain setting; `CNAME` alone does not configur
    `185.199.111.153`; `www` points to `lpoli.github.io`. With the same owner, no routing change is
    expected. Preserve verification TXT, SPF and mail records; inspect differences before changing DNS.
 2. Configure the new repository for Actions and validate its release before transferring the domain.
-   Remove the old repository Pages custom-domain setting, then immediately set `gohealax.com` in
-   the new repository. With branch publication on the old repository, also remove its root CNAME
-   so a later build cannot reclaim the domain. Do not change the approved new artifact's CNAME.
+   Set `gohealax.com` in the new repository. The old repository is deleted; if GitHub still reports
+   the domain as claimed, stop and resolve that stale association in GitHub.
+   Do not change the approved new artifact's CNAME.
 3. Trigger the new workflow on the synchronized `main` with the approved manifest hash. Record
    run/deployment ID, time and public split revision. Wait for successful deployment and certificate
    readiness, enable Enforce HTTPS and check apex HTTPS plus `www` canonical redirect.
@@ -134,10 +135,9 @@ not rewrite history and the hash gate proves the restored artifact. Do not deplo
 revision without confirming it contains the reviewed workflow and standalone validation fixture.
 The local `--restore` commands below verify retained package integrity independently.
 
-Domain rollback is separate: remove the new Pages custom domain, restore the old repository's
-recorded Pages source/domain (and root CNAME for branch publication), verify the old deployment/TLS,
-and restore only DNS records actually changed. Preserve TXT/mail. The historical old tree includes
-owner-rejected documents; do not restore those documents into public HEAD during rollback.
+Domain rollback is separate: restore only DNS records actually changed and preserve TXT/mail.
+The old repository has been deleted, so switching back to its former Pages configuration is no
+longer an available rollback. Restore a prior approved artifact through the new repository instead.
 
 ## Exact export allowlist and replacement
 
@@ -188,15 +188,11 @@ package after a changed candidate and assert every original byte and manifest re
 
 ## WEB-07 existing-site review and rollback
 
-The historical `lpoli/gohealax` tree was recorded at
-`1ff05316cf3b15233104ecdf1f337c4b85601239`, containing CNAME, index.html, LICENSE and
-`docs/privacy-policy.md`. The owner approved deleting the accidental Apache-2.0 licence and obsolete
-Markdown privacy document on 2026-10-14. No new open-source licence is requested. Recheck old main
-before deleting exactly these two files in a normal commit/push; preserve the homepage until the
-new deployment is prepared. Stop and refresh the backup if old main changed.
+The owner reports that `lpoli/gohealax` has been deleted. The accidental licence and obsolete
+Markdown privacy-document cleanup is therefore obsolete; do not clone or recreate that repository.
 
 The exact historical backup remains at `web/.artifacts/web-07/previous-public-repository.tar.gz`,
 SHA-256 `ef62571c4821986ff1fcf24fd44f461eb3309c946c943070e929f20072cf3681`.
-It is recovery evidence, not a package to republish unchanged. For an old-host rollback restore the
-historical homepage and required CNAME in a new commit while retaining the licence/privacy deletions.
-Never force-push. Current execution evidence and any access blockers belong in the handoff.
+It is recovery evidence, not a package to republish unchanged. Preserve it locally; historical
+licence/privacy files must not be reintroduced into the new public mirror or hosted artifact.
+Current execution evidence and any access blockers belong in the handoff.
