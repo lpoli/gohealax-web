@@ -1,0 +1,64 @@
+name: Publish approved website
+
+on:
+  workflow_dispatch:
+    inputs:
+      manifest_sha256:
+        description: Owner-approved manifest SHA-256 (64 lowercase hexadecimal characters)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'lpoli/gohealax-web' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Validate standalone source
+        run: |
+          python3 -m unittest discover -s tests -p 'test_*.py'
+          python3 tests/audit.py
+          python3 scripts/prepare-release.py --check
+      - name: Export and verify approved package
+        env:
+          APPROVED_MANIFEST_SHA256: ${{ inputs.manifest_sha256 }}
+        run: |
+          python3 scripts/prepare-release.py
+          python3 scripts/verify-approved-release.py --manifest-sha256 "$APPROVED_MANIFEST_SHA256"
+          printf 'Source revision: %s\nApproved manifest: %s\n' "$GITHUB_SHA" "$APPROVED_MANIFEST_SHA256" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: .release/site
+      - name: Retain manifest as release evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: approved-manifest
+          path: .release/manifest.json
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy approved artifact
+        id: deployment
+        uses: actions/deploy-pages@v4

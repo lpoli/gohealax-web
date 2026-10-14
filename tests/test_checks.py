@@ -3,6 +3,9 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
+
+import site_checks
 
 from site_checks import (Document, WEB, local_target, metadata_issues, read_document,
                          reference_issues, required_disclaimer, structure_issues)
@@ -36,6 +39,19 @@ class ParserTests(unittest.TestCase):
         text = required_disclaimer()
         self.assertTrue(text.startswith("GoHealaX does not diagnose"))
         self.assertTrue(text.endswith("exercise programme."))
+
+    def test_standalone_disclaimer_and_stale_monorepo_fixture(self):
+        artifacts = WEB / '.artifacts'
+        artifacts.mkdir(exist_ok=True)
+        with TemporaryDirectory(prefix='disclaimer-', dir=artifacts) as directory:
+            root = Path(directory)
+            with patch.object(site_checks, 'REPO', root):
+                self.assertTrue(required_disclaimer().startswith('GoHealaX does not diagnose'))
+                canonical = root / 'docs/product/requirements.md'
+                canonical.parent.mkdir(parents=True)
+                canonical.write_text('**PROD-01 — Purpose.** Include “Changed disclaimer.”\n')
+                with self.assertRaisesRegex(ValueError, 'fixture is stale'):
+                    required_disclaimer()
 
 
 class ReferenceTests(unittest.TestCase):

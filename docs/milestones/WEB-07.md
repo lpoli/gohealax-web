@@ -6,15 +6,17 @@ Status/approval: roadmap; evidence: [handoff](../handoff.md).
 
 ## Permitted changes and sources
 
-Owner publishes the approved package to the separate public repository and configures GitHub Pages,
-DNS and HTTPS; an agent acts only if explicitly delegated. Sources: [deployment](../deployment.md),
+The owner delegated the source-mirror/Actions migration on 2026-10-14. Synchronize committed
+`web/` with Git subtree to `lpoli/gohealax-web`; manually deploy the approved site artifact and
+transfer the Pages domain after preparing the new deployment. Sources: [deployment](../deployment.md),
 approved manifest, [provenance](../provenance.md), and rechecked official GitHub guidance. Any source
 change requires retesting/export and renewed package approval before publication.
 
 ## Acceptance
 
-- Publication contains only approved export bytes. Record package hash, monorepo revision, public
-  repository/publication commit, deployment identifier and timestamp.
+- The public source mirror matches the committed `web/` tree and excludes other components.
+  The hosted artifact contains only approved export bytes. Record package hash, monorepo revision,
+  subtree/publication revision, Actions run/deployment identifier and timestamp.
 - Record authoritative before/after DNS, account TXT verification separately from repository domain
   settings, HTTPS and `www` redirect. Preserve mail and unrelated DNS records.
 - Verify landing, exact-case About, Privacy, Disclaimer, 404 including an unknown nested URL,

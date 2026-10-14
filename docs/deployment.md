@@ -1,12 +1,67 @@
 # Website export and publication
 
-This is a local release procedure, not evidence of live hosting. The owner identified the dedicated
-publication repository as `lpoli/gohealax` on 2026-10-13. WEB-07 preflight independently confirms a
-public repository and existing GitHub Pages hosting. The owner confirms repository/domain control
-and website asset distribution rights. Current recursive DNS and HTTPS evidence is recorded in
-[handoff](handoff.md#web-07-launch-preflight); direct authoritative DNS, authenticated Pages settings
-and account-level verification still need confirmation. Existing routing already matches GitHub Pages.
-The owner publishes in WEB-07 unless they explicitly delegate the action.
+The monorepo remains the source of truth. The owner selected one-way Git subtree synchronization
+of all committed `web/` files to the public `lpoli/gohealax-web` repository on 2026-10-14.
+`ssd` and `mycc` retain their existing URLs and full-monorepo workflow. Source synchronization and
+live deployment are separate operations. No Git hooks or force pushes are used.
+
+## Separate public repository
+
+The public source mirror contains `site/`, `docs/`, `tests/`, `scripts/`, `tools/`, `asset-sources/`,
+`image-ref/`, README and the other tracked Web files, including their Web-only history. Native
+components and monorepo root files are excluded. Ignored exports, caches and profiles are excluded.
+Documentation and references are public source, but are never part of the hosted website.
+
+From the monorepo root, after validating and committing the intended changes:
+
+```sh
+# Add once; inspect an existing remote before reusing its name.
+git remote add webgithub git@github.com:lpoli/gohealax-web.git
+git ls-remote webgithub
+git subtree split --prefix=web
+# Compare the printed split revision's root tree with HEAD:web before pushing.
+git rev-parse HEAD:web
+git rev-parse <split-revision>^{tree}
+git subtree push --prefix=web webgithub main
+```
+
+The two tree hashes must match. Inspect the split root and confirm only Web files are present.
+Before the first push, inspect the destination history: if it has conflicting initial commits,
+stop and reconcile them with the owner. Never overwrite that history. Subsequent pushes are normal
+fast-forward updates. Develop in the monorepo; direct GitHub edits cause divergence and must be
+reconciled before the next synchronization. Existing private remotes and branch tracking stay unchanged.
+See [Git subtree documentation](https://github.com/git/git/blob/master/contrib/subtree/git-subtree.adoc).
+
+## Manual GitHub Actions publication
+
+The source workflow is [pages.yml](../.github/workflows/pages.yml); subtree export places it at
+`.github/workflows/pages.yml` in the mirror. Configure Settings → Pages → Source to **GitHub Actions**.
+Source pushes never trigger publication. Actions → Publish approved website → Run workflow on
+`main` requires `manifest_sha256`, the exact owner-approved manifest SHA-256. The workflow is
+restricted to `lpoli/gohealax-web` and `main`, runs offline tests/audit/export validation, exports,
+then [verifies approval](../scripts/verify-approved-release.py) before uploading `.release/site/`
+only. A mismatching hash or altered site fails before deployment. The manifest is retained as a
+separate Actions artifact; the run summary records source revision and approved hash.
+
+From the standalone mirror root:
+
+```sh
+python3 -m unittest discover -s tests -p 'test_*.py'
+python3 tests/audit.py
+python3 scripts/prepare-release.py --check
+python3 scripts/prepare-release.py
+python3 scripts/verify-approved-release.py --manifest-sha256 9a2b92b3757712d130d1f2205c41bce36fa6a7c0e296628b253dc3730fd21aef
+```
+
+The derived [PROD-01 fixture](../tests/fixtures/prod-01-disclaimer.txt) makes validation independent
+of the private monorepo. Monorepo validation additionally compares it to canonical PROD-01 and
+fails if stale. Regenerate the fixture from the canonical quoted disclaimer when that requirement
+changes; never silently change the requirement in the public mirror.
+
+Only the 24-file approved site artifact is hosted at the domain root. The workflow uses the
+`github-pages` environment and deployment-scoped `pages: write`/`id-token: write` permissions.
+Official [custom workflow guidance](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)
+was rechecked on 2026-10-14. Package approval is not live-site approval.
 
 ## Export boundary (WEB-06)
 
@@ -39,48 +94,50 @@ Export inspection uses `python3 web/tools/preview.py --exported --port 8001`.
 This serves the exported document root and actual custom nested 404, on loopback only. Approve the exact
 manifest hash and monorepo revision before publishing. Export approval is not permission to change DNS.
 
-## Separate public repository
+## Domain and HTTPS (WEB-07)
 
-Publish only `web/.release/site/` contents to the dedicated public repository's `main` branch, root
-folder. Never publish this monorepo. Configure Pages to deploy from that branch and `/ (root)`.
-An empty `.nojekyll` prevents Jekyll processing. `CNAME` contains only `gohealax.com` plus a newline.
-The owner supplied `lpoli/gohealax`; use the concrete commands below only after the remaining
-launch prerequisites and package approval. Never push to the monorepo's private remotes.
+Prepare and validate the new repository/workflow before transferring `gohealax.com` from
+`lpoli/gohealax`. Confirm authenticated administrative access and account-level domain verification.
+Retain GitHub's verification TXT and all unrelated/email records. Save old/new Pages settings and
+DNS evidence before mutation. Source `CNAME` is retained in the approved artifact, but GitHub Actions
+uses the repository Pages custom-domain setting; `CNAME` alone does not configure the domain.
 
-GitHub supports branch/root publication; see its
-[publishing-source guidance](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
-(rechecked 2026-10-13; recheck before launch).
+1. Recheck authoritative NS, apex A/AAAA/CAA/MX/TXT, `www` CNAME and the account challenge TXT.
+   Existing intended A records are `185.199.108.153`, `185.199.109.153`, `185.199.110.153`,
+   `185.199.111.153`; `www` points to `lpoli.github.io`. With the same owner, no routing change is
+   expected. Preserve verification TXT, SPF and mail records; inspect differences before changing DNS.
+2. Configure the new repository for Actions and validate its release before transferring the domain.
+   Remove the old repository Pages custom-domain setting, then immediately set `gohealax.com` in
+   the new repository. With branch publication on the old repository, also remove its root CNAME
+   so a later build cannot reclaim the domain. Do not change the approved new artifact's CNAME.
+3. Trigger the new workflow on the synchronized `main` with the approved manifest hash. Record
+   run/deployment ID, time and public split revision. Wait for successful deployment and certificate
+   readiness, enable Enforce HTTPS and check apex HTTPS plus `www` canonical redirect.
+4. Compare all live assets/pages with the approved manifest. Check About, Privacy, Disclaimer,
+   robots/sitemap, CSS/JS/images and the custom 404 on an unknown nested URL (HTTP 404 with the
+   approved 404 document). Check contact/download state and initial network behavior. Record
+   owner desktop/mobile, keyboard and console inspection and explicit live-site approval.
 
-## Domain and HTTPS (owner, WEB-07)
-
-1. Record the current authoritative DNS answers and hosting, including apex, `www`, NS, MX and TXT
-   records. Confirm control of the dedicated repository, domain and all publication rights.
-2. Verify the domain at account level with GitHub's supplied TXT record. This is distinct from the
-   repository custom-domain setting. Preserve verification and all unrelated/email records.
-3. Set the repository custom domain to `gohealax.com` before changing DNS routing. Recheck current
-   official values at launch. The planned apex A records are `185.199.108.153`, `185.199.109.153`,
-   `185.199.110.153`, `185.199.111.153`; `www` is a CNAME to `<owner>.github.io`. Do not set a
-   wildcard. Resolve conflicting obsolete routing records only with the recorded owner-approved plan.
-4. Wait for DNS/certificate readiness, enable HTTPS, and verify HTTPS plus `www` redirect to the
-   intended canonical apex. Do not claim success while certificate provisioning is pending.
-5. Verify all public routes and anchors, case-sensitive About, assets, no initial third-party
-   requests, robots/sitemap, unknown nested URL behavior, contact and actual store link state.
-
-Reference: [GitHub custom-domain guidance](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site).
-The values above are planning inputs, not authorization or evidence of DNS changes.
+Reference: [GitHub domain guidance](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site)
+(rechecked 2026-10-14). Final acceptance remains in [WEB-07](milestones/WEB-07.md).
 
 ## Release evidence and rollback
 
-Record owner approval of the exact package/manifest hash, monorepo revision, publication repository
-and commit, deployment identifier/time, domain verification, before/after DNS, HTTPS and redirect
-results, route/asset checks and explicit live-site approval. WEB-07 is not Complete before that final
-approval. Store sanitized evidence in the Web handoff; keep credentials and private DNS tokens out.
+Record monorepo revision, subtree/public revision, manifest hash, Actions run/deployment ID/time,
+Pages settings, before/after DNS, verification TXT confirmation, TLS/redirect and route/asset results
+in [handoff](handoff.md). WEB-07 becomes Complete only after explicit owner live-site approval.
 
-Content rollback: republish the previous approved package without rebuilding it; record the new
-publication commit and repeat live checks. DNS rollback is separate: restore the recorded prior
-routing under owner authority, preserve email/TXT records, and verify the previous host and TLS.
-Test the content rollback procedure locally in WEB-06 before launch.
+Content rollback: retain every approved package and manifest in the monorepo artifact area.
+Restore the previous approved site bytes to `web/site/`, validate and commit a normal rollback,
+synchronize the subtree and manually deploy with that previous approved manifest hash. This does
+not rewrite history and the hash gate proves the restored artifact. Do not deploy an older public
+revision without confirming it contains the reviewed workflow and standalone validation fixture.
+The local `--restore` commands below verify retained package integrity independently.
 
+Domain rollback is separate: remove the new Pages custom domain, restore the old repository's
+recorded Pages source/domain (and root CNAME for branch publication), verify the old deployment/TLS,
+and restore only DNS records actually changed. Preserve TXT/mail. The historical old tree includes
+owner-rejected documents; do not restore those documents into public HEAD during rollback.
 
 ## Exact export allowlist and replacement
 
@@ -129,79 +186,17 @@ previously retained 23-file packages without the new project logo; normal source
 `--restore` and writes no package or temporary files. Local regression tests restore a previous
 package after a changed candidate and assert every original byte and manifest returns.
 
-## Owner publication commands for WEB-07
-
-These are future owner-run commands, not executed publication. Before using them: confirm this is
-an independent public repository, inspect its existing files/history and Pages configuration, confirm
-access/domain/rights, record DNS and existing hosting, commit the monorepo implementation, and approve
-this exact package hash and committed revision. If the remote is missing or private, stop and resolve
-that explicitly. The following clone must be new and clean; do not reuse an arbitrary checkout.
-All local writes remain within this working directory.
-
-```sh
-git clone --branch main https://github.com/lpoli/gohealax.git web/.artifacts/public-gohealax
-git -C web/.artifacts/public-gohealax remote -v
-git -C web/.artifacts/public-gohealax status --short
-# Review every proposed deletion and replacement first; .git alone is preserved.
-rsync -a --dry-run --delete --exclude='/.git/' web/.artifacts/releases/9a2b92b3757712d130d1f2205c41bce36fa6a7c0e296628b253dc3730fd21aef/site/ web/.artifacts/public-gohealax/
-rsync -a --delete --exclude='/.git/' web/.artifacts/releases/9a2b92b3757712d130d1f2205c41bce36fa6a7c0e296628b253dc3730fd21aef/site/ web/.artifacts/public-gohealax/
-git -C web/.artifacts/public-gohealax add --all
-git -C web/.artifacts/public-gohealax diff --cached --stat
-git -C web/.artifacts/public-gohealax diff --cached --check
-git -C web/.artifacts/public-gohealax commit -m "Publish approved GoHealaX website package 9a2b92b3"
-git -C web/.artifacts/public-gohealax push origin main
-```
-
-If the repository is empty and has no `main`, the clone command needs owner setup first; do not
-invent a branch/history. `rsync --delete` intentionally makes the public working tree exactly the
-approved site; review the dry run before execution. The manifest, snapshots and documentation are
-never copied. For content rollback, substitute the previous approved hash-named snapshot in those
-same copy/commit/push commands, then repeat live checks. Never force-push or rebuild the old package.
-
-In repository Settings → Pages select **Deploy from a branch**, `main`, `/ (root)`.
-Verify the domain at account level; set repository custom domain to `gohealax.com` before DNS routing,
-then follow the DNS/HTTPS steps above. CNAME bytes alone do not establish domain configuration.
-Current official Pages guidance was rechecked on 2026-10-13; A values above still match. Recheck
-again when launching. No live DNS/HTTPS/deployment state was inferred from these instructions.
-
-The earlier WEB-06 candidate (`16535334…87c4`) is retained locally for rollback, but superseded
-for owner review by the project-logo candidate above.
-
 ## WEB-07 existing-site review and rollback
 
-The approved source is now committed at `5ba3f2b79b59f62b4dbd0f9f0318f746a59ff0e4`.
-Preflight on 2026-10-13 found the existing public `main` commit
-`1ff05316cf3b15233104ecdf1f337c4b85601239`. Its four files are `CNAME`, `index.html`, `LICENSE`
-and `docs/privacy-policy.md`. The exact-package copy above proposes 22 additions, replacement of
-the homepage/CNAME, and removal of the existing licence and Markdown privacy document. On
-2026-10-14 the owner approved both removals: Apache-2.0 was added unintentionally; the owner
-states the project is proprietary. Do not add an open-source licence or republish the obsolete
-privacy document. The approved package remains unchanged. This does not delegate an agent push. The proposed changes are saved in `web/.artifacts/web-07/publication-diff.json`.
+The historical `lpoli/gohealax` tree was recorded at
+`1ff05316cf3b15233104ecdf1f337c4b85601239`, containing CNAME, index.html, LICENSE and
+`docs/privacy-policy.md`. The owner approved deleting the accidental Apache-2.0 licence and obsolete
+Markdown privacy document on 2026-10-14. No new open-source licence is requested. Recheck old main
+before deleting exactly these two files in a normal commit/push; preserve the homepage until the
+new deployment is prepared. Stop and refresh the backup if old main changed.
 
-Before copying, confirm public `main` still matches that recorded commit; if it moved, stop and
-refresh the backup/diff. A read-only archive of the prior public tree is retained at
-`web/.artifacts/web-07/previous-public-repository.tar.gz`, SHA-256
-`ef62571c4821986ff1fcf24fd44f461eb3309c946c943070e929f20072cf3681`.
-All four archive files were inspected; the archived homepage exactly matches the current live
-homepage. No checkout/push or rollback was performed.
-
-For an owner-run rollback after publication, use the clean public checkout with no unrelated
-changes, review restoring the recorded prior tree, then create a new commit and push normally:
-
-```sh
-git -C web/.artifacts/public-gohealax restore --source=1ff05316cf3b15233104ecdf1f337c4b85601239 --staged --worktree -- .
-git -C web/.artifacts/public-gohealax rm --ignore-unmatch LICENSE docs/privacy-policy.md
-git -C web/.artifacts/public-gohealax diff --cached --stat
-git -C web/.artifacts/public-gohealax diff --cached --check
-git -C web/.artifacts/public-gohealax commit -m "Restore pre-WEB-07 public website"
-git -C web/.artifacts/public-gohealax push origin main
-```
-
-This restores the prior homepage/CNAME while retaining the owner-requested licence/privacy
-removals. The archive is an exact historical backup, not a package to republish unchanged. No
-history rewrite or rebuild is involved. Repeat HTTPS/homepage/redirect checks; the old
-site does not provide the new WEB-07 routes. Execution remains unrun. DNS restoration is separate:
-retain the preflight A/CNAME/NS/MX/TXT evidence, confirm it directly against authoritative servers
-and the Namecheap account, and restore only records actually changed under owner authority.
-No DNS change is proposed for the currently working apex/www routing. Account-verification TXT
-records must be retained, alongside SPF/mail records.
+The exact historical backup remains at `web/.artifacts/web-07/previous-public-repository.tar.gz`,
+SHA-256 `ef62571c4821986ff1fcf24fd44f461eb3309c946c943070e929f20072cf3681`.
+It is recovery evidence, not a package to republish unchanged. For an old-host rollback restore the
+historical homepage and required CNAME in a new commit while retaining the licence/privacy deletions.
+Never force-push. Current execution evidence and any access blockers belong in the handoff.

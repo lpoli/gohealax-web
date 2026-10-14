@@ -83,10 +83,16 @@ def read_document(path):
 
 
 def required_disclaimer():
-    """Read PROD-01 from its canonical owner instead of maintaining a second literal."""
-    text = (REPO / "docs/product/requirements.md").read_text(encoding="utf-8")
-    line = next(line for line in text.splitlines() if line.startswith("**PROD-01 "))
-    return line.split("“", 1)[1].split("”", 1)[0]
+    """Use the derived fixture; enforce its canonical owner when in the monorepo."""
+    fixture = (WEB / "tests/fixtures/prod-01-disclaimer.txt").read_text(encoding="utf-8").strip()
+    canonical = REPO / "docs/product/requirements.md"
+    if canonical.is_file():
+        text = canonical.read_text(encoding="utf-8")
+        line = next(line for line in text.splitlines() if line.startswith("**PROD-01 "))
+        expected = line.split("“", 1)[1].split("”", 1)[0]
+        if fixture != expected:
+            raise ValueError("PROD-01 fixture is stale; regenerate from canonical requirements")
+    return fixture
 
 
 def local_target(root, page, url):

@@ -1,5 +1,6 @@
 """Release safety tests; temporary packages never leave the repository."""
 import importlib.util
+import hashlib
 from pathlib import Path
 import shutil
 import subprocess
@@ -14,6 +15,10 @@ from test_preview import QuietHandler, request, preview
 spec = importlib.util.spec_from_file_location('release', WEB / 'scripts/prepare-release.py')
 release = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(release)
+
+spec = importlib.util.spec_from_file_location('approval', WEB / 'scripts/verify-approved-release.py')
+approval = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(approval)
 
 
 class ReleaseTests(unittest.TestCase):
@@ -32,6 +37,20 @@ class ReleaseTests(unittest.TestCase):
     def snapshot(self):
         return {p.relative_to(self.output).as_posix(): p.read_bytes()
                 for p in self.output.rglob('*') if p.is_file()}
+
+    def test_approval_rejects_wrong_hash_invalid_input_and_changed_site(self):
+        data = self.install()
+        expected = hashlib.sha256(data).hexdigest()
+        approval.verify(expected, self.output)
+        with self.assertRaisesRegex(ValueError, 'differs from the approved'):
+            approval.verify('0' * 64, self.output)
+        for invalid in ('', expected.upper(), '$(echo unsafe)', expected + '\n'):
+            with self.subTest(invalid=invalid), self.assertRaisesRegex(ValueError, '64 lowercase'):
+                approval.verify(invalid, self.output)
+        with (self.output / 'site/site.css').open('a') as stream:
+            stream.write('\n/* altered after export */\n')
+        with self.assertRaisesRegex(ValueError, 'site differs from its manifest'):
+            approval.verify(expected, self.output)
 
     def test_byte_identical_deterministic_export_and_exact_exclusions(self):
         first = self.install()

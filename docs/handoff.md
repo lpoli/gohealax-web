@@ -826,3 +826,50 @@ Only website files are intended for publication; the private application monorep
 The dedicated website repository is currently public, so its files are visible. If the owner wants
 that repository private too, settle GitHub plan/Pages compatibility and hosting choice before
 changing visibility. No visibility change has been authorized or executed.
+
+## WEB-07 source mirror migration
+
+2026-10-14 owner plan supersedes the earlier artifact-only `lpoli/gohealax` publication commands.
+Keep the monorepo; synchronize committed `web/` with Git subtree to public `lpoli/gohealax-web`.
+Existing `ssd`/`mycc` URLs and branch tracking remain unchanged; added `webgithub` with the requested
+SSH URL. No automatic hooks, deployment-on-push or force pushes. The source mirror includes tracked
+Web documentation, tests, reference images and Web history. Only the approved artifact is hosted.
+[Deployment](deployment.md) owns the synchronization, domain transfer and rollback procedure.
+ADR-0008 was amended to record the owner refinement.
+
+Implemented a manual Actions workflow restricted to the new repository's `main`, requiring the
+approved manifest SHA-256, running offline validation and exporting before upload/deploy. The hash
+verifier also compares actual site bytes to the manifest; hostile input is passed through an environment
+variable and validated as lowercase SHA-256. Derived PROD-01 fixture makes standalone validation
+possible, while monorepo checks reject drift from canonical requirements. No site source changed.
+
+Agent-run monorepo checks: 51 Python tests PASS; audit zero findings; exporter check and export
+PASS (24 files); approved-manifest verifier PASS for
+`9a2b92b3757712d130d1f2205c41bce36fa6a7c0e296628b253dc3730fd21aef`; documentation links PASS
+(91 Markdown files at the first check). Wrong/malformed hashes, altered site bytes and a stale
+canonical fixture are covered by regression tests. No browser/device checks repeated because
+public page bytes are unchanged. Historical backup checksum remains
+`ef62571c4821986ff1fcf24fd44f461eb3309c946c943070e929f20072cf3681`.
+
+Authenticated SSH preflight: standard port 22 did not complete; port 443 with workspace-local
+GitHub API-published host keys succeeds, and `git ls-remote webgithub` returns no refs. Public
+GitHub API confirms the new repository is public and Pages is not yet configured. No GitHub CLI
+or API token is available here. Source synchronization is possible over SSH; authenticated Pages
+settings and workflow dispatch currently require owner action. Account verification TXT must be
+confirmed and preserved. Domain transfer, Actions deployment, post-launch verification and final
+owner live-site approval remain pending; WEB-07 stays In progress.
+
+Exact validation commands (monorepo root):
+
+```sh
+python3 -m unittest discover -s web/tests -p 'test_*.py'
+python3 web/tests/audit.py
+python3 web/scripts/prepare-release.py --check
+python3 web/scripts/prepare-release.py
+python3 web/scripts/verify-approved-release.py --manifest-sha256 9a2b92b3757712d130d1f2205c41bce36fa6a7c0e296628b253dc3730fd21aef
+python3 scripts/check-doc-links.py
+```
+
+Synchronization/standalone verification and old-repository cleanup results are recorded below
+when executed. Public revision and deployment evidence are separate; do not infer deployment
+from a successful source push. Earlier launch-preflight evidence describes the old hosting only.

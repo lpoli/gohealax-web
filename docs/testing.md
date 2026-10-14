@@ -212,3 +212,13 @@ byte equality tests tie those results to the export. Exported root rendering is 
 `--exported`, `--root` and `--lan` are mutually exclusive. Export preview fails clearly if the package
 is missing. Saved package restore commands and future publication/rollback are in
 [deployment](deployment.md#retain-and-restore-a-reviewed-package). Nothing here publishes or changes DNS.
+
+## Standalone source mirror and deployment approval
+
+In `lpoli/gohealax-web`, run the same suite/audit/export commands without the `web/` prefix.
+The root documentation link checker belongs to the monorepo; Web documents link back to private
+canonical contracts that are intentionally absent from the public mirror. The derived PROD-01
+fixture is compared to canonical requirements whenever they are present in monorepo validation.
+Tests prove standalone fallback, stale-fixture failure, malformed/wrong approval hashes, and altered
+export bytes. The manual [Pages workflow](../.github/workflows/pages.yml) runs those gates and
+verifies the approved manifest before uploading only `.release/site/`. See [deployment](deployment.md).
