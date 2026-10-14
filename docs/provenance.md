@@ -163,3 +163,13 @@ and distribution licence remain unrecorded in the shared branding register; this
 not invent a licence or establish external publication. WEB-07 remains the publication gate.
 The older CSS “g” header mark is replaced. WEB-05 favicon/touch/social assets retain their previously
 recorded provenance; the requested change is to the leading header logo.
+
+## WEB-07 publication-rights confirmation (2026-10-13)
+
+Asked to confirm control of `lpoli/gohealax` and `gohealax.com`, and public website distribution
+rights for the project logo and supplied app screenshots, the owner replied “yes of course”.
+This records owner-confirmed permission for public use of the selected logo and four screenshots
+on this website, superseding their local-review-only restriction above. The logo creator/source
+was requested but not identified; no authorship or general distribution licence is inferred.
+Existing Pexels and original quality-asset provenance remains applicable. Publication itself still
+follows WEB-07's owner-run/delegation gate; the rights confirmation does not approve a push or DNS change.

@@ -1,9 +1,11 @@
 # Website export and publication
 
 This is a local release procedure, not evidence of live hosting. The owner identified the dedicated
-publication repository as `lpoli/gohealax` on 2026-10-13. Repository visibility/access and separation
-from the private monorepo are not independently verified. Authoritative DNS, hosting provider and
-domain authority remain unverified.
+publication repository as `lpoli/gohealax` on 2026-10-13. WEB-07 preflight independently confirms a
+public repository and existing GitHub Pages hosting. The owner confirms repository/domain control
+and website asset distribution rights. Current recursive DNS and HTTPS evidence is recorded in
+[handoff](handoff.md#web-07-launch-preflight); direct authoritative DNS, authenticated Pages settings
+and account-level verification still need confirmation. Existing routing already matches GitHub Pages.
 The owner publishes in WEB-07 unless they explicitly delegate the action.
 
 ## Export boundary (WEB-06)
@@ -164,3 +166,42 @@ again when launching. No live DNS/HTTPS/deployment state was inferred from these
 
 The earlier WEB-06 candidate (`16535334…87c4`) is retained locally for rollback, but superseded
 for owner review by the project-logo candidate above.
+
+## WEB-07 existing-site review and rollback
+
+The approved source is now committed at `5ba3f2b79b59f62b4dbd0f9f0318f746a59ff0e4`.
+Preflight on 2026-10-13 found the existing public `main` commit
+`1ff05316cf3b15233104ecdf1f337c4b85601239`. Its four files are `CNAME`, `index.html`, `LICENSE`
+and `docs/privacy-policy.md`. The exact-package copy above proposes 22 additions, replacement of
+the homepage/CNAME, and removal of the existing licence and Markdown privacy document. On
+2026-10-14 the owner approved both removals: Apache-2.0 was added unintentionally; the owner
+states the project is proprietary. Do not add an open-source licence or republish the obsolete
+privacy document. The approved package remains unchanged. This does not delegate an agent push. The proposed changes are saved in `web/.artifacts/web-07/publication-diff.json`.
+
+Before copying, confirm public `main` still matches that recorded commit; if it moved, stop and
+refresh the backup/diff. A read-only archive of the prior public tree is retained at
+`web/.artifacts/web-07/previous-public-repository.tar.gz`, SHA-256
+`ef62571c4821986ff1fcf24fd44f461eb3309c946c943070e929f20072cf3681`.
+All four archive files were inspected; the archived homepage exactly matches the current live
+homepage. No checkout/push or rollback was performed.
+
+For an owner-run rollback after publication, use the clean public checkout with no unrelated
+changes, review restoring the recorded prior tree, then create a new commit and push normally:
+
+```sh
+git -C web/.artifacts/public-gohealax restore --source=1ff05316cf3b15233104ecdf1f337c4b85601239 --staged --worktree -- .
+git -C web/.artifacts/public-gohealax rm --ignore-unmatch LICENSE docs/privacy-policy.md
+git -C web/.artifacts/public-gohealax diff --cached --stat
+git -C web/.artifacts/public-gohealax diff --cached --check
+git -C web/.artifacts/public-gohealax commit -m "Restore pre-WEB-07 public website"
+git -C web/.artifacts/public-gohealax push origin main
+```
+
+This restores the prior homepage/CNAME while retaining the owner-requested licence/privacy
+removals. The archive is an exact historical backup, not a package to republish unchanged. No
+history rewrite or rebuild is involved. Repeat HTTPS/homepage/redirect checks; the old
+site does not provide the new WEB-07 routes. Execution remains unrun. DNS restoration is separate:
+retain the preflight A/CNAME/NS/MX/TXT evidence, confirm it directly against authoritative servers
+and the Namecheap account, and restore only records actually changed under owner authority.
+No DNS change is proposed for the currently working apex/www routing. Account-verification TXT
+records must be retained, alongside SPF/mail records.

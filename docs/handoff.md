@@ -698,3 +698,131 @@ revision before publication. The owner requested a commit message, not creation 
 Approval handoff validation: `python3 web/scripts/prepare-release.py --check` PASS (24 files,
 approved hash); `python3 scripts/check-doc-links.py` PASS (91 Markdown files);
 `git diff --check` PASS. Approval documentation does not change package bytes.
+
+## WEB-07 launch preflight
+
+Started at the owner's request on 2026-10-13. This section supersedes WEB-06's historical
+“uncommitted/unverified hosting” notes: approved source revision is now
+`5ba3f2b79b59f62b4dbd0f9f0318f746a59ff0e4`. No publication, push or DNS change occurred.
+Publication remains owner-run unless explicitly delegated.
+
+### Package validation
+
+Approved manifest SHA-256 remains
+`9a2b92b3757712d130d1f2205c41bce36fa6a7c0e296628b253dc3730fd21aef`.
+All 24 source/export/retained-snapshot files were compared to manifest sizes and hashes, including
+exact path sets: PASS. Public source bytes are unchanged. Agent-run on Linux:
+
+```sh
+python3 -m unittest discover -s web/tests -p 'test_*.py'
+python3 web/tests/audit.py
+python3 web/scripts/prepare-release.py --check
+python3 scripts/check-doc-links.py
+sha256sum web/.release/manifest.json
+git rev-parse HEAD
+```
+
+49 tests PASS; audit zero findings; source validation PASS (24 files, approved hash);
+documentation links PASS. No browser/mobile/assistive checks were repeated. Final live manual
+acceptance remains pending.
+
+### Existing public state
+
+Read-only network probes used approved execution outside the restricted network sandbox, normal
+TLS verification, GET requests, 20-second timeouts and redirect following. All saved responses and
+the backup are under ignored `web/.artifacts/web-07/`; no writes outside the working directory.
+GitHub API confirms `lpoli/gohealax` is public, Pages is enabled, and public `main` is at
+`1ff05316cf3b15233104ecdf1f337c4b85601239`. Latest listed deployment: `5607510626`, created
+`2026-07-26T05:11:55Z`, with that same revision. Unauthenticated Pages-settings API returns 404;
+this does not establish that Pages is absent and does not verify its source/custom-domain/HTTPS
+settings or agent write access.
+
+The prior public tree has four files; a saved archive's homepage exactly matches live bytes.
+Proposed publication diff: 22 additions, two replacements (`index.html`, `CNAME`), two removals
+(`LICENSE`, `docs/privacy-policy.md`). Owner approved both removals on 2026-10-14 (details below). Archive checksum and
+rollback commands are in [deployment](deployment.md#web-07-existing-site-review-and-rollback).
+Agent publication still requires explicit delegation; owner-run publication remains the default.
+
+| HTTPS request | Result |
+|---|---|
+| `/` | 200; old homepage, byte-identical to prior public revision |
+| `/About.html`, `/privacy-policy.html`, `/medical-disclaimer.html` | 404 |
+| `/404.html`, `/unknown/nested/path` | 404; host default, not approved custom document |
+| `/site.css`, `/site.js`, `/media.js` | 404 |
+| `/robots.txt`, `/sitemap.xml` | 404 |
+| `https://www.gohealax.com/` | 301 to HTTPS apex, then 200 |
+
+Headers identify GitHub serving; apex/www TLS requests succeeded. Capture around
+`2026-10-13 12:25 UTC`. These are existing-host checks, not new-package acceptance or proof of the
+Enforce HTTPS setting. Contact/download/network behavior and all approved assets need live checks
+after publication. No checkout/push or rollback was performed.
+
+### DNS and owner confirmation
+
+Google DNS-over-HTTPS queries (`https://dns.google/resolve?name=<name>&type=<type>`) captured:
+
+- NS: `dns1.registrar-servers.com.`, `dns2.registrar-servers.com.`.
+- A: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`.
+- `www` CNAME: `lpoli.github.io.`.
+- MX: priority 10 `eforward1`, `eforward2`, `eforward3`; priority 15 `eforward4`; priority 20
+  `eforward5`, all under `registrar-servers.com.`.
+- Apex TXT: `v=spf1 include:spf.efwd.registrar-servers.com ~all`.
+- Apex AAAA/CAA: no answers (NOERROR with SOA).
+- `_github-pages-challenge-lpoli.gohealax.com` TXT: NXDOMAIN. Confirm the account UI/generated
+  record rather than inferring account verification state from DNS alone.
+
+This is recursive resolver evidence, not direct authoritative verification. `dig` is unavailable;
+direct authoritative queries and full Namecheap zone review were not run. On an equipped host run
+the milestone queries against both listed authoritative servers, also including challenge TXT,
+AAAA/CAA and www records. Preserve mail/SPF/unrelated records. Existing apex/www routing already
+matches GitHub Pages; no routing change is proposed.
+
+The owner replied “yes of course” to confirmation of repository/domain control and public website
+distribution rights for the logo/screenshots. This is owner-reported control/permission, not
+authenticated agent access or an authorship claim. See
+[provenance](provenance.md#web-07-publication-rights-confirmation-2026-10-13).
+
+Official [GitHub domain guidance](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site),
+[account verification](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/verifying-your-custom-domain-for-github-pages)
+and [Namecheap setup](https://www.namecheap.com/support/knowledgebase/article.aspx/9645/2208/how-do-i-link-my-domain-to-github-pages/)
+were rechecked on 2026-10-13. GitHub serves file paths; Namecheap DNS routes the hostname.
+Intended publication remains `main`, root, custom domain `gohealax.com`.
+
+### Remaining owner actions and acceptance
+
+1. Confirm GitHub account Settings → Pages domain verification. If absent, add GitHub's supplied
+   TXT in Namecheap, verify it and retain it. Confirm repository Pages source/custom domain/HTTPS
+   settings, and direct authoritative DNS evidence.
+2. Removal of `LICENSE` and the old Markdown privacy page is owner-approved on 2026-10-14;
+   publish the approved package without either file. Do not reintroduce them during rollback.
+3. Owner publishes the retained approved package or explicitly delegates. Recheck public main
+   before copying, retain rollback, and record publication commit/deployment/time.
+4. Compare all live package bytes to the manifest, check routes/custom nested 404/assets/metadata,
+   contact/download state/TLS/redirects; owner checks desktop/mobile, keyboard, console and initial
+   network behavior. Download/demo intentionally remain “coming soon”.
+5. Record explicit owner live-site approval before completion. Publication, account verification,
+   direct DNS evidence, post-launch checks and owner acceptance are still unfinished.
+
+
+### WEB-07 owner decisions (2026-10-14)
+
+The owner reports Apache-2.0 was added unknowingly, states the project is solely proprietary,
+and requests not retaining the old privacy document. Both removals are approved. No new
+open-source licence is requested. The approved 24-file package already excludes both files;
+no source/export/hash change is necessary. Preserve the historical backup; rollback instructions
+now retain these removals. No public repository/history change has been executed.
+
+The owner sees `gohealax.com` under repository Pages → Custom domain and the message
+“Your site is live at https://gohealax.com/”. This confirms repository domain configuration as
+owner-reported evidence, consistent with prior HTTPS checks. It does not confirm account-level
+verified-domain status. Check profile Settings → Pages → Verified domains separately; if absent,
+use Add a domain, add GitHub's generated TXT at Namecheap and click Verify. Account verification,
+publishing source/HTTPS settings and direct authoritative DNS evidence remain pending.
+Official [account verification](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/verifying-your-custom-domain-for-github-pages)
+and [Pages availability](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)
+guidance were rechecked on 2026-10-14; no live probes repeated.
+
+Only website files are intended for publication; the private application monorepo remains excluded.
+The dedicated website repository is currently public, so its files are visible. If the owner wants
+that repository private too, settle GitHub plan/Pages compatibility and hosting choice before
+changing visibility. No visibility change has been authorized or executed.

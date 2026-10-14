@@ -13,7 +13,7 @@ status. Acceptance details live in the linked milestone files; evidence and bloc
 | [WEB-04](milestones/WEB-04.md) | Disclosure navigation, optional media and legal pages | Complete | Approved 2026-10-13; [owner approval](handoff.md#web-04-owner-approval) |
 | [WEB-05](milestones/WEB-05.md) | Accessibility, performance, metadata and 404 | Complete | Approved 2026-10-13; [owner review and Lighthouse evidence](handoff.md#web-05-owner-review-and-approval) |
 | [WEB-06](milestones/WEB-06.md) | Deterministic export and release preparation | Complete | Approved 2026-10-13; [exact package and launch prerequisites](handoff.md#web-06-owner-approval) |
-| [WEB-07](milestones/WEB-07.md) | Owner publication and verified launch | Not started | Pending |
+| [WEB-07](milestones/WEB-07.md) | Owner publication and verified launch | In progress | Pending; [preflight and owner actions](handoff.md#web-07-launch-preflight) |
 
 ## Gate rules
 
